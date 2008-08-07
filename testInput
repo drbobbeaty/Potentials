@@ -1,0 +1,58 @@
+#
+# Comment lines start with a #
+#
+# The workspace line is of the form:
+#
+# WS <x> <y> <width> <height> <rows> <cols>
+#
+# where:
+#	<x> <y> - the origin of the workspace
+#	<width> - the width of the workspace
+#	<height> - the height of the workspace
+#	<rows> <cols> - the rows and columns of the simulation grid
+#
+# Format of each sim object line is:
+#
+# <shape><type> <x> <y> <shape_options> <type_options>
+#
+# followed by type/shape specific information. The following are supported:
+#
+# <shape> = C - Circle
+#           R - Rectangle
+#           L - Line
+#           P - Point
+#
+# <type>  = M - Metal
+#           D - Dielectric
+#           C - Charge Sheet
+#
+# and the <shape_options> are specific for each shape:
+#
+# 	CIRCLE:
+# 		<shape_options> = <radius>
+#
+# 	RECTANGLE:
+# 		<shape_options> = <width> <height>
+#
+# 	LINE:
+# 		<shape_options> = <endx> <endy>
+#
+# 	POINT:
+# 		<shape_options> are not applicable
+#
+# and the <type_options> are specific for each shape:
+#
+# 	METAL:
+# 		<type_options> = <voltage>
+#
+# 	DIELECTRIC:
+# 		<type_options> = <epsilonR>
+#
+# 	CHARGE SHEET:
+# 		<type_options> = <rho>
+#
+WS 0.0 0.0 10.0 10.0 50 20
+LM 0.0 0.0 10.0 0.0 0
+LM 0.0 10.0 10.0 10.0 1
+RC 2.5 2.5 2.5 2.5 10.0
+PM 5.0 5.0 50
