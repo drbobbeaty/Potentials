@@ -7,7 +7,7 @@
 //
 
 // RCS Identification information
-static char *rcsID = "$Id: MrBig.m,v 1.1 2008/08/07 20:32:58 drbob Exp $";
+static char *rcsID = "$Id: MrBig.m,v 1.2 2009/01/29 21:42:16 drbob Exp $";
 static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 // Apple Headers
@@ -621,9 +621,9 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 	// let's open up a standard C FILE for this as we don't need anything fancy
 	if (!error) {
-		FILE	*all = fopen([filename cString], "w");
-		FILE	*volt = fopen([[filename stringByAppendingString:@"_v.txt"] cString], "w");
-		FILE	*mage = fopen([[filename stringByAppendingString:@"_e.txt"] cString], "w");
+		FILE	*all = fopen([filename UTF8String], "w");
+		FILE	*volt = fopen([[filename stringByAppendingString:@"_v.txt"] UTF8String], "w");
+		FILE	*mage = fopen([[filename stringByAppendingString:@"_e.txt"] UTF8String], "w");
 		if ((all == NULL) || (volt == NULL) || (mage == NULL)) {
 			error = YES;
 			NSLog(@"[MrBig -writeOutResults:] - the file: '%@' could not be opened for writing out the results. This is a serious problem that needs to be looked into.", filename);
