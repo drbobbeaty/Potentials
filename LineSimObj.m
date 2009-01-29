@@ -7,7 +7,7 @@
 //
 
 // RCS Identification information
-static char *rcsID = "$Id: LineSimObj.m,v 1.1 2008/08/07 20:32:58 drbob Exp $";
+static char *rcsID = "$Id: LineSimObj.m,v 1.2 2009/01/29 21:42:50 drbob Exp $";
 static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 // Apple Headers
@@ -290,20 +290,20 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 **	creating a duplicate.
 "*/
 {
-	BOOL			error = NO;
-	BOOL			allDone = NO;
+	BOOL		error = NO;
+	BOOL		allDone = NO;
 	// these are for the Cohen-Sutherland algorithm
-	NSPoint		zero;
-	CODE			zeroCode = 0;
-	NSPoint		one;
-	CODE			oneCode = 0;
-	CODE			c = 0;
-	float			x = 0.0;
-	float			y = 0.0;
-	float			xmin = -1.0;
-	float			xmax = -1.0;
-	float			ymin = -1.0;
-	float			ymax = -1.0;
+	NSPoint		zero = { .x = 0, .y = 0 };
+	CODE		zeroCode = 0;
+	NSPoint		one = { .x = 0, .y = 0 };
+	CODE		oneCode = 0;
+	CODE		c = 0;
+	float		x = 0.0;
+	float		y = 0.0;
+	float		xmin = -1.0;
+	float		xmax = -1.0;
+	float		ymin = -1.0;
+	float		ymax = -1.0;
 	
 	// first, make sure we have something to do
 	if (!error && !allDone) {
