@@ -335,7 +335,7 @@
 				GCC_PREFIX_HEADER = Potentials_Prefix.h;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-Potentials__Upgraded_.plist";
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
@@ -367,7 +367,7 @@
 				GCC_PREFIX_HEADER = Potentials_Prefix.h;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
-				INFOPLIST_FILE = "Info-Potentials__Upgraded_.plist";
+				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "$(HOME)/Applications";
 				LIBRARY_SEARCH_PATHS = "";
 				OTHER_CFLAGS = "";
@@ -390,10 +390,14 @@
 					ppc,
 					i386,
 				);
-				GCC_AUTO_VECTORIZATION = YES;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_AUTO_VECTORIZATION = NO;
 				GCC_ENABLE_SSE3_EXTENSIONS = YES;
 				GCC_MODEL_PPC64 = NO;
+				GCC_STRICT_ALIASING = NO;
+				OTHER_CFLAGS = "";
 				SDKROOT = macosx10.5;
+				WARNING_CFLAGS = "";
 			};
 			name = Development;
 		};
@@ -404,9 +408,13 @@
 					ppc,
 					i386,
 				);
-				GCC_AUTO_VECTORIZATION = YES;
+				GCC_ALTIVEC_EXTENSIONS = YES;
+				GCC_AUTO_VECTORIZATION = NO;
 				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_STRICT_ALIASING = NO;
+				OTHER_CFLAGS = "";
 				SDKROOT = macosx10.5;
+				WARNING_CFLAGS = "";
 			};
 			name = Deployment;
 		};
@@ -415,9 +423,12 @@
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				GCC_ALTIVEC_EXTENSIONS = YES;
-				GCC_AUTO_VECTORIZATION = YES;
+				GCC_AUTO_VECTORIZATION = NO;
 				GCC_ENABLE_SSE3_EXTENSIONS = YES;
+				GCC_STRICT_ALIASING = NO;
+				OTHER_CFLAGS = "";
 				SDKROOT = macosx10.5;
+				WARNING_CFLAGS = "";
 			};
 			name = Default;
 		};
