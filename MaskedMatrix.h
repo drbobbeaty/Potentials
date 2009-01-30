@@ -30,10 +30,10 @@
 
 @interface MaskedMatrix : NSObject {
 	@private
-	int						_rowCnt;
-	int						_colCnt;
-	double**			_data;
-	BOOL**				_mask;
+	int				_rowCnt;
+	int				_colCnt;
+	double**		_data;
+	BOOL**			_mask;
 }
 
 /*"              Accessor Methods             "*/
