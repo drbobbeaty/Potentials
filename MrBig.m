@@ -7,7 +7,7 @@
 //
 
 // RCS Identification information
-static char *rcsID = "$Id: MrBig.m,v 1.2 2009/01/29 21:42:16 drbob Exp $";
+static char *rcsID = "$Id: MrBig.m,v 1.3 2009/02/02 19:37:32 drbob Exp $";
 static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 // Apple Headers
@@ -70,31 +70,6 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 //               Accessor Methods
 //----------------------------------------------------------------------------
 
-- (void) setWorkspace:(SimWorkspace*)ws
-/*"
-**	This method sets the workspace that will be used for subsequent sims
-**	of the objects in the associated factory's inventory. The two pieces
-**	need to work together through this controller to get the job done.
-"*/
-{
-	if (_workspace != ws) {
-		[_workspace release];
-		_workspace = [ws retain];
-	}
-}
-
-
-- (SimWorkspace*) getWorkspace
-/*"
-**	This method returns the workspace that is used for subsequent sims
-**	of the objects in the associated factory's inventory. The two pieces
-**	need to work together through this controller to get the job done.
-"*/
-{
-	return _workspace;
-}
-
-
 - (void) setFactory:(SimObjFactory*)factory
 /*"
 **	This method sets the factory to the supplied value. The factory not
@@ -117,33 +92,6 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 "*/
 {
 	return _factory;
-}
-
-
-- (void) setSrcFileName:(NSTextField*)field
-/*"
-**	This method sets the NSTextField that will be used in the application
-**	to get the source file name from the user. This method will almost
-**	certainly never get called as the connection is established in
-**	InterfaceBuilder, but for the sake of completness, here it is.
-"*/
-{
-	if (_srcFileName != field) {
-		[_srcFileName release];
-		_srcFileName = [field retain];
-	}
-}
-
-
-- (NSTextField*) getSrcFileName
-/*"
-**	This method returns the NSTextField that will contain the file name
-**	of the source data for this application. The user will enter this in
-**	some manner and then we'll use it in the app to know what to read
-**	from.
-"*/
-{
-	return _srcFileName;
 }
 
 
@@ -203,28 +151,88 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
-- (void) setLogView:(NSTextView*)view
+- (void) setContentView:(NSScrollView*)view
 /*"
-**	This method sets the NSTextView that will be used in the application
-**	to send detailedd log messages to the user during the run. This method
+**	This method sets the NSScrollView that will be used in the application
+**	to allow the user to modify the source for the simulation. This method
 **	will almost certainly never get called as the connection is established
 **	in InterfaceBuilder, but for the sake of completness, here it is.
 "*/
 {
-	if (_logView != view) {
-		[_logView release];
-		_logView = [view retain];
+	if (_contentView != view) {
+		[_contentView release];
+		_contentView = [view retain];
 	}
 }
 
 
-- (NSTextView*) getLogView
+- (NSScrollView*) getContentView
 /*"
-**	This method returns the NSTextView that will be used in the application
-**	to send detailedd log messages to the user during the run.
+**	This method returns the NSScrollView that will be used in the application
+**	to allow the user to modify the source for the simulation.
 "*/
 {
-	return _logView;
+	return _contentView;
+}
+
+
+- (NSTextView*) getContentText
+/*"
+ **  This method returns the NSTextView that contains the content of the
+ **  simulation source for viewing/creating/editing.
+ "*/
+{
+	return [[self getContentView] documentView];
+}
+
+
+- (void) setWorkspace:(SimWorkspace*)ws
+/*"
+ **	This method sets the workspace that will be used for subsequent sims
+ **	of the objects in the associated factory's inventory. The two pieces
+ **	need to work together through this controller to get the job done.
+ "*/
+{
+	if (_workspace != ws) {
+		[_workspace release];
+		_workspace = [ws retain];
+	}
+}
+
+
+- (SimWorkspace*) getWorkspace
+/*"
+ **	This method returns the workspace that is used for subsequent sims
+ **	of the objects in the associated factory's inventory. The two pieces
+ **	need to work together through this controller to get the job done.
+ "*/
+{
+	return _workspace;
+}
+
+
+- (void) setSrcFileName:(NSString*)name
+/*"
+ ** This method sets the name of the file that's currently being worked
+ ** on in the 'contentView'. This is important because we need to know
+ ** where it came from to save changes and to write the output.
+ "*/
+{
+	if (_srcFileName != name) {
+		[_srcFileName release];
+		_srcFileName = [name retain];
+	}
+}
+
+
+- (NSString*) getSrcFileName
+/*"
+ ** This method returns the name of the file whose contents are in the
+ ** 'contentView' where it's available to be edited, and then run. When
+ ** it's run we'll use this method to see where to put the output files.
+ "*/
+{
+	return _srcFileName;
 }
 
 
@@ -234,96 +242,189 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 - (void) loadFromFile:(id)sender
 /*"
-**	This method is called most often by the user clicking on a button on
-**	the UI to indicate that he's put in the filename to load and use. So
-**	what we want to do is to load this file up... set up the workspace
-**	and all the simulation objects based on this file and then fire off
-**	the simulation with a call to -runSim:. It's very much the all-in-one
-**	method but that's OK - if I need to later I can split it up.
-"*/
+ **	This method is called most often by the user initiating a load from the
+ ** filesystem for a simulation definition. We need to load it up and place
+ ** it in the 'contentView' so that it can be edited, or simulated. As the
+ ** user sees fit.
+ "*/
 {
 	BOOL		error = NO;
-	NSString*	filename = nil;
-	NSArray*	lines = nil;
 	
-	// first, turn on the "busy bar" though we don't know how long it'll be
-	[[self getProgressBar] startAnimation:self];
-	// ...and change the status line to something useful
-	[self showStatus:@"Loading the file"];
-
+	// Create the File Open Dialog class.
+	NSOpenPanel*	openDlg = nil;
+	if (!error) {
+		openDlg = [NSOpenPanel openPanel];
+		if (openDlg == nil) {
+			error = YES;
+			NSLog(@"[MrBig -loadFromFile:] - I could not create an NSOpenPanel for asking the user what file to load. Please check on this as soon as possible.");
+		} else {
+			/*
+			 * Set up the default config for the dialog:
+			 * - choose files, and directories to get to the file
+			 * - select only one file.
+			 */
+			[openDlg setCanChooseFiles:YES];
+			[openDlg setCanChooseDirectories:YES];
+			[openDlg setAllowsMultipleSelection:NO];
+		}
+	}
+	
 	/*
-	 * Next, get the file that we're going to use as an NSArray of NSStrings
+	 * Display the dialog.  If the OK button was pressed,
+	 * process the files.
 	 */
 	if (!error) {
-		filename = [[self getSrcFileName] stringValue];
-		if (filename == nil) {
+		if ([openDlg runModalForDirectory:nil file:nil] == NSOKButton) {
+			/*
+			 * Get an array containing the full filenames of all
+			 * files and directories selected.
+			 */
+			NSArray*	files = [openDlg filenames];
+			if ((files != nil) && ([files count] > 0)) {
+				[self setSrcFileName:[files objectAtIndex:0]];
+			} else {
+				// no file names to use, can't do a thing
+				error = true;
+				NSLog(@"[MrBig -loadFromFile:] - the Open Dialog indicated that there was something to do, but there was no filename available. This is something to look into.");
+			}
+		} else {
+			// we have no filename selected, so do nothing else
+			error = true;
+		}
+	}
+
+	// turn on the "spinning wheel and update the status if we have a file
+	if (!error) {
+		// first, turn on the "busy bar" though we don't know how long it'll be
+		[[self getProgressBar] startAnimation:self];
+		// ...and change the status line to something useful
+		[self showStatus:@"Loading the file"];
+	}
+
+	/*
+	 * Next, get the file that we're going to use and load it up
+	 */
+	if (!error) {
+		if ([self getSrcFileName] == nil) {
 			error = YES;
 			NSLog(@"[MrBig -loadFromFile:] - there is no file specified in the proper location of the UI. Please make sure that there is a file and it's available for reading before trying to load it.");
 		} else {
-			NSString*	contents = [NSString stringWithContentsOfFile:filename];
+			NSString*	contents = [NSString stringWithContentsOfFile:[self getSrcFileName] encoding:NSUTF8StringEncoding error:NULL];
 			if (contents == nil) {
 				error = YES;
-				NSLog(@"[MrBig -loadFromFile:] - the file specified in the UI: '%@' could not be read into an NSString. Please make sure that there is a file and it's available for reading before trying to load it.", filename);
+				NSLog(@"[MrBig -loadFromFile:] - the file specified in the UI: '%@' could not be read into an NSString. Please make sure that there is a file and it's available for reading before trying to load it.", [self getSrcFileName]);
 			} else {
-				lines = [contents componentsSeparatedByString:@"\n"];
-				if (lines == nil) {
-					error = YES;
-					NSLog(@"[MrBig -loadFromFile:] - the file specified in the UI: '%@' could not be parsed into a series of lines. Please make sure that there is a file and it's available for reading before trying to load it.", filename);
-				}
+				// save it to the content view
+				[[self getContentText] setString:contents];
 			}
 		}
-	}
-
-	/*
-	 * For each line in the array, see if it's a comment, if so skip it.
-	 * If it starts with "WS" then it's the SimWorkspace definition line
-	 * and we need to build a new workspace based on what it says. If it's
-	 * anything else, pass it to the Factory for it to process.
-	 */
-	if (!error) {
-		NSString*		line = nil;
-		NSEnumerator*	enumerator = [lines objectEnumerator];
-		if (enumerator != nil) {
-			while (line = [enumerator nextObject]) {
-				// see if it starts with a '#' - a comment
-				if ([line hasPrefix:@"#"] || ([line length] == 0)) {
-					// go back and get another line
-					continue;
-				}
-
-				// see if it starts with 'WS' - a workspace command
-				if ([line hasPrefix:@"WS"]) {
-					SimWorkspace*		ws = [self createWorkspace:line];
-					if (ws == nil) {
-						error = YES;
-						NSLog(@"[MrBig -loadFromFile:] - the line in the file : '%@' was supposed to construct a workspace, but it failed. Please check the logs for the possible cause: '%@'", filename, line);
-					} else {
-						// save this guy for our use later
-						[self setWorkspace:ws];
-					}
-
-					// go back and get another line
-					continue;
-				}
-
-				// everything else goes to the Factory
-				if ([[self getFactory] createSimObjWithString:line] == nil) {
-					error = YES;
-					NSLog(@"[MrBig -loadFromFile:] - the line in the file : '%@' could not be parsed into simulation object. Please make sure that the format is correct: '%@'", filename, line);
-				}
-			}
-		}
-	}
-
-	// for simplicity sake, run this simulation now
-	if (!error) {
-		[self runSim:sender];
 	}
 
 	// turn off the "busy bar"
 	[[self getProgressBar] stopAnimation:self];
+	if (!error) {
+		// ...and change the status line to something useful
+		[self showStatus:@"Loaded"];
+	}
+}
+
+
+- (IBAction) saveToFile:(id)sender
+/*"
+ ** This method is called when the user wants to save the existing file in
+ ** the 'contentView' to the file already loaded - basically, saving it on
+ ** top of itself. Standard stuff.
+ "*/
+{
+	BOOL		error = NO;
+	
+	// first, turn on the "busy bar" though we don't know how long it'll be
+	[[self getProgressBar] startAnimation:self];
 	// ...and change the status line to something useful
-	[self showStatus:@"Done"];
+	[self showStatus:@"Saving the file"];
+	
+	/*
+	 * Next, get the file that we're going to use for saving all this
+	 */
+	if (!error) {
+		if ([self getSrcFileName] == nil) {
+			// nothing? then make the user pick the name
+			[self saveAsToFile:sender];
+		} else {
+			if (![[[self getContentText] string] writeToFile:[self getSrcFileName] atomically:YES encoding:NSUTF8StringEncoding error:NULL]) {
+				error = YES;
+				NSLog(@"[MrBig -saveToFile:] - the file '%@'could not be written to. Please check on permissions.", [self getSrcFileName]);
+				// show a decent status to let the user know the issue
+				[self showStatus:@"Could not save file - check space/perms"];
+			} else {
+				// show a decent status to let the user know it's OK
+				[self showStatus:@"Saved"];
+			}
+		}
+	}
+	
+	// turn off the "busy bar"
+	[[self getProgressBar] stopAnimation:self];
+}
+
+
+- (IBAction) saveAsToFile:(id)sender
+/*"
+ ** This method is called when there's no existing filename for the simulation
+ ** we have loaded into the active workspace. In this case, we need to have the
+ ** user give us a filename to use and then create the file.
+ "*/
+{
+	BOOL		error = NO;
+	
+	// Create the File Save Dialog class.
+	NSSavePanel*	saveDlg = nil;
+	if (!error) {
+		saveDlg = [NSSavePanel savePanel];
+		if (saveDlg == nil) {
+			error = YES;
+			NSLog(@"[MrBig -saveAsToFile:] - I could not create an NSSavePanel for asking the user what file to save this as. Please check on this as soon as possible.");
+		} else {
+			// set the save dialog to use '.pot' files
+			[saveDlg setRequiredFileType:@"pot"];
+		}
+	}
+	
+	/*
+	 * Display the dialog.  If the OK button was pressed,
+	 * read the file name and use it.
+	 */
+	if (!error) {
+		if ([saveDlg runModalForDirectory:nil file:nil] == NSOKButton) {
+			[self setSrcFileName:[saveDlg filename]];
+		} else {
+			// we have no filename selected, so do nothing else
+			error = true;
+		}
+	}
+
+	// let the simpler 'save' do the work
+	if (!error) {
+		[self saveToFile:sender];
+	}
+}
+
+
+- (IBAction) clearSimulation:(id)sender
+/*"
+ ** This method clears out all the "stuff" of the current simulation so
+ ** that the user can start a fresh with a new source and then run it
+ ** or not, as they see fit.
+ "*/
+{
+	// clear out the factory of all instruments
+	[[self getFactory] removeAllInventory];
+	[self setWorkspace:nil];
+	// clear out the content and it's filename
+	[[self getContentText] setString:@""];
+	[self setSrcFileName:nil];
+	// show a decent status to let the user know it's OK
+	[self showStatus:@"Ready"];
 }
 
 
@@ -337,9 +438,21 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 {
 	BOOL				error = NO;
 	SimWorkspace*		ws = nil;
-	SimObjFactory*		factory = nil;
 
-	// first, make sure we have a workspace and a factory to use
+	// first, load up the simulation engine (factory & workspace)
+	if (!error) {
+		// first, clear out the factory's contents as it sits now
+		[[self getFactory] removeAllInventory];
+		// ...and now load it up with the current 'content' from the user
+		if (![self loadEngine:[[self getContentText] string]]) {
+			error = YES;
+			NSLog(@"[MrBig -runSim:] - while trying to load up the simulator with the contents of the current document an error occured. This is bad news.");
+			// put some reasonable error in the status line
+			[self showStatus:@"Parsing error in source"];
+		}
+	}
+
+	// next, make sure we have a workspace to use
 	if (!error) {
 		ws = [self getWorkspace]; 
 		if (ws == nil) {
@@ -347,21 +460,16 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 			NSLog(@"[MrBig -runSim:] - there is no defined workspace with which to run this simulation. Please make sure there is before calling this method.");
 		}
 	}
-	if (!error) {
-		factory = [self getFactory];
-		if (factory == nil) {
-			error = YES;
-			NSLog(@"[MrBig -runSim:] - there is no defined factory with which to run this simulation. Please make sure there is before calling this method.");
-		}
-	}
 
 	// change the status line to something useful
-	[self showStatus:@"Adding objects to workspace"];
+	if (!error) {
+		[self showStatus:@"Adding objects to workspace"];
+	}
 
 	// now add all the factory's objects to the workspace
 	if (!error) {
 		BaseSimObj*		obj = nil;
-		NSEnumerator*	enumerator = [[factory getInventory] objectEnumerator];
+		NSEnumerator*	enumerator = [[[self getFactory] getInventory] objectEnumerator];
 		if (enumerator != nil) {
 			while (obj = [enumerator nextObject]) {
 				// everything goes to the Workspace
@@ -373,7 +481,9 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 	}
 
 	// change the status line to something useful
-	[self showStatus:@"Simulating workspace"];
+	if (!error) {
+		[self showStatus:@"Simulating workspace"];
+	}
 
 	// now run the simulation on the workspace
 	if (!error) {
@@ -385,11 +495,13 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 	// to make things simple, output the results of the simulation
 	if (!error) {
-		[self writeOutResults:(NSString*)[[[self getSrcFileName] stringValue] stringByAppendingString:@".ans"]];
+		[self writeOutResults:(NSString*)[[[self getSrcFileName] stringByDeletingPathExtension] stringByAppendingString:@".ans"]];
 	}
 
 	// change the status line to something useful
-	[self showStatus:@"Done with simulation"];
+	if (!error) {
+		[self showStatus:@"Done with simulation"];
+	}
 }
 
 
@@ -405,15 +517,13 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 **	defaults.
 "*/
 {
-	// set the progress indicator to the 'circular' style
-	[[self getProgressBar] setStyle:NSProgressIndicatorSpinningStyle];
-	[[self getProgressBar] setDisplayedWhenStopped:NO];
-
+	// this is the font that I want to use with the content pane
+	[[self getContentText] setFont:[NSFont fontWithName:@"Consolas" size:10.0]];
+	// clear out the content area as we wish it to appear clean
+	[[self getContentText] setString:@""];
+	
 	// Set the status to a simple 'Ready'
 	[self showStatus:@"Ready"];
-
-	// Clear out the log message area
-	[self clearLog];
 }
 
 
@@ -463,32 +573,80 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
-- (void) clearLog
-/*"
-**	This method clears out the NSTextView that holds all the log messages.
-**	This is nice for the user when they've been doing a lot and they want
-**	to clear it out before they do something else.
-"*/
-{
-	[[self getLogView] setString:@""];
-}
-
-
-- (void) log:(NSString*)line;
-/*"
-**	This method adds the provided line to the end of the NSTextView that
-**	displays all the log messages for this application. There's nothing
-**	special about what this does other than to make it look no different
-**	from general log messages.
-"*/
-{
-	[[self getLogView] setString:[[[self getLogView] string] stringByAppendingString:line]];
-}
-
-
 //----------------------------------------------------------------------------
 //               Actions Helper Methods
 //----------------------------------------------------------------------------
+
+- (BOOL) loadEngine:(NSString*)source
+/*"
+ ** This method is going to load up the simulation engine with the data
+ ** represented by the string passed in from, say, a file or the content
+ ** that the user is working on. It builds up everything and then returns
+ ** YES if it's all OK.
+ "*/
+{
+	BOOL		error = NO;
+
+	// break the source string into lines for parsing by the factory
+	NSArray*	lines = nil;
+	if (!error) {
+		if (source == nil) {
+			error = YES;
+			NSLog(@"[MrBig -loadEngine:] - the specified string is nil and that means that there's nothing I can process. Please make sure there's something to do before calling this method.");
+		} else {
+			// ...and then break it up into lines for the factory
+			lines = [source componentsSeparatedByString:@"\n"];
+			if (lines == nil) {
+				error = YES;
+				NSLog(@"[MrBig -loadEngine:] - the specified string could not be parsed into a series of lines. Please make sure that there is a something there to do before trying to load it.");
+			}
+		}
+	}
+	
+	/*
+	 * For each line in the array, see if it's a comment, if so skip it.
+	 * If it starts with "WS" then it's the SimWorkspace definition line
+	 * and we need to build a new workspace based on what it says. If it's
+	 * anything else, pass it to the Factory for it to process.
+	 */
+	if (!error) {
+		NSString*		line = nil;
+		NSEnumerator*	enumerator = [lines objectEnumerator];
+		if (enumerator != nil) {
+			while (line = [enumerator nextObject]) {
+				// see if it starts with a '#' - a comment
+				if ([line hasPrefix:@"#"] || ([line length] == 0)) {
+					// go back and get another line
+					continue;
+				}
+				
+				// see if it starts with 'WS' - a workspace command
+				if ([line hasPrefix:@"WS"]) {
+					SimWorkspace*		ws = [self createWorkspace:line];
+					if (ws == nil) {
+						error = YES;
+						NSLog(@"[MrBig -loadEngine:] - the line in the source was supposed to construct a workspace, but it failed. Please check the logs for the possible cause: '%@'", line);
+					} else {
+						// save this guy for our use later
+						[self setWorkspace:ws];
+					}
+					
+					// go back and get another line
+					continue;
+				}
+				
+				// everything else goes to the Factory
+				if ([[self getFactory] createSimObjWithString:line] == nil) {
+					error = YES;
+					NSLog(@"[MrBig -loadEngine:] - the line in the source could not be parsed into simulation object. Please make sure that the format is correct: '%@'", line);
+				}
+			}
+		}
+	}
+
+	return !error;
+}
+
 
 - (SimWorkspace*) createWorkspace:(NSString*)line
 /*"
