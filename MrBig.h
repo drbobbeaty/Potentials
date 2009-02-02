@@ -32,44 +32,39 @@
 
 
 @interface MrBig : NSObject {
-#if IB_WAS_SMARTER
-	id				workspace;
-	id				factory;
-	id				srcFileName;
-	id				progressBar;
-	id				statusLine;
-	id				logField;
-#endif
-
 	@private
-	SimWorkspace*			_workspace;
-	SimObjFactory*			_factory;
-	NSTextField*			_srcFileName;
-	NSProgressIndicator*	_progressBar;
-	NSTextField*			_statusLine;
-	NSTextView*				_logView;
+	IBOutlet SimObjFactory*			_factory;
+	IBOutlet NSProgressIndicator*	_progressBar;
+	IBOutlet NSTextField*			_statusLine;
+	IBOutlet NSScrollView*			_contentView;
+	SimWorkspace*					_workspace;
+	NSString*						_srcFileName;
 }
 
 /*"				Initialization Methods				"*/
 + (void) initialize;
 
 /*"       Accessor Methods        "*/
-- (void) setWorkspace:(SimWorkspace*)ws;
-- (SimWorkspace*) getWorkspace;
 - (void) setFactory:(SimObjFactory*)factory;
 - (SimObjFactory*) getFactory;
-- (void) setSrcFileName:(NSTextField*)field;
-- (NSTextField*) getSrcFileName;
 - (void) setProgressBar:(NSProgressIndicator*)bar;
 - (NSProgressIndicator*) getProgressBar;
 - (void) setStatusLine:(NSTextField*)field;
 - (NSTextField*) getStatusLine;
-- (void) setLogView:(NSTextView*)view;
-- (NSTextView*) getLogView;
+- (void) setContentView:(NSScrollView*)view;
+- (NSScrollView*) getContentView;
+- (NSTextView*) getContentText;
+- (void) setWorkspace:(SimWorkspace*)ws;
+- (SimWorkspace*) getWorkspace;
+- (void) setSrcFileName:(NSString*)name;
+- (NSString*) getSrcFileName;
 
 /*"				IB Actions							"*/
-- (void) loadFromFile:(id)sender;
-- (void) runSim:(id)sender;
+- (IBAction) loadFromFile:(id)sender;
+- (IBAction) saveToFile:(id)sender;
+- (IBAction) saveAsToFile:(id)sender;
+- (IBAction) clearSimulation:(id)sender;
+- (IBAction) runSim:(id)sender;
 
 /*"				General Housekeeping		"*/
 - (void) awakeFromNib;
@@ -82,10 +77,9 @@
 
 /*"				Convenience UI Methods         	"*/
 - (void) showStatus:(NSString*)status;
-- (void) clearLog;
-- (void) log:(NSString*)line;
 
 /*"				Actions Helper Methods         	"*/
+- (BOOL) loadEngine:(NSString*)source;
 - (SimWorkspace*) createWorkspace:(NSString*)line;
 - (void) writeOutResults:(NSString*)filename;
 

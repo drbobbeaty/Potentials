@@ -23,9 +23,15 @@
 		<dict>
 			<key>ACTIONS</key>
 			<dict>
+				<key>clearSimulation</key>
+				<string>id</string>
 				<key>loadFromFile</key>
 				<string>id</string>
 				<key>runSim</key>
+				<string>id</string>
+				<key>saveAsToFile</key>
+				<string>id</string>
+				<key>saveToFile</key>
 				<string>id</string>
 			</dict>
 			<key>CLASS</key>
@@ -34,18 +40,14 @@
 			<string>ObjC</string>
 			<key>OUTLETS</key>
 			<dict>
-				<key>factory</key>
-				<string>id</string>
-				<key>logField</key>
-				<string>id</string>
-				<key>progressBar</key>
-				<string>id</string>
-				<key>srcFileName</key>
-				<string>id</string>
-				<key>statusLine</key>
-				<string>id</string>
-				<key>workspace</key>
-				<string>id</string>
+				<key>_contentView</key>
+				<string>NSScrollView</string>
+				<key>_factory</key>
+				<string>SimObjFactory</string>
+				<key>_progressBar</key>
+				<string>NSProgressIndicator</string>
+				<key>_statusLine</key>
+				<string>NSTextField</string>
 			</dict>
 			<key>SUPERCLASS</key>
 			<string>NSObject</string>
