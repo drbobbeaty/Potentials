@@ -7,7 +7,7 @@
 //
 
 // RCS Identification information
-static char *rcsID = "$Id: MrBig.m,v 1.3 2009/02/02 19:37:32 drbob Exp $";
+static char *rcsID = "$Id: MrBig.m,v 1.4 2009/09/11 21:20:06 drbob Exp $";
 static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 
 // Apple Headers
@@ -569,7 +569,7 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 "*/
 {
 	[[self getStatusLine] setStringValue:status];
-	NSLog(status);
+	NSLog(@"%@", status);
 }
 
 

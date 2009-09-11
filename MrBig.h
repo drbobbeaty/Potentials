@@ -16,9 +16,9 @@
 // Other Headers
 
 // Class Headers
-#import "BaseSimObj.h";
-#import "SimWorkspace.h";
-#import "SimObjFactory.h";
+#import "BaseSimObj.h"
+#import "SimWorkspace.h"
+#import "SimObjFactory.h"
 
 // Superclass Headers
 
