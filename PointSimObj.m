@@ -6,10 +6,6 @@
 //  Copyright (c) 2003 The Man from S.P.U.D.. All rights reserved.
 //
 
-// RCS Identification information
-static char *rcsID = "$Id: PointSimObj.m,v 1.1 2008/08/07 20:32:58 drbob Exp $";
-static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
-
 // Apple Headers
 
 // System Headers
@@ -32,71 +28,72 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 // Public Macros
 
 
+/*!
+ @class PointSimObj
+ This class is basically the BaseSimObj in that it's a simple point in
+ the simulation occupying only a single simulation node - a point source.
+ Most of the functionality for this class comes from the superclass,
+ but there are a few convenience methods that are in this class.
+ */
 @implementation PointSimObj
-/*"
-**	This class is basically the BaseSimObj in that it's a simple point in
-**	the simulation occupying only a single simulation node - a point source.
-**	Most of the functionality for this class comes from the superclass,
-**	but there are a few convenience methods that are in this class.
-"*/
 
 //----------------------------------------------------------------------------
 //               Accessor Methods
 //----------------------------------------------------------------------------
 
+/*!
+ This method sets the location of the point in the real-space coordinate
+ system of the workspace. This is a convenience method to the BaseSimObj,
+ but is nice for those times where it's more appropriate.
+ */
 - (void) setLocation:(NSPoint)p
-/*"
-**	This method sets the location of the point in the real-space coordinate
-**	system of the workspace. This is a convenience method to the BaseSimObj,
-**	but is nice for those times where it's more appropriate.
-"*/
 {
 	[self setCenter:p];
 }
 
 
+/*!
+ This method returns the real-space cooordinates of the point.
+ */
 - (NSPoint) getLocation
-/*"
-**	This method returns the real-space cooordinates of the point.
-"*/
 {
 	return [self getCenter];
 }
 
 
+/*!
+ This method sets the real-space coordinate along the x-axis which is also
+ the 'columns' in the simulation grid.
+ */
 - (void) setX:(float)x
-/*"
-**	This method sets the real-space coordinate along the x-axis which is also
-**	the 'columns' in the simulation grid.
-"*/
 {
 	[self setCenterX:x];
 }
 
 
+/*!
+ This method returns the real-space x-axis value of the point.
+ */
 - (float) getX
-/*"
-**	This method returns the real-space x-axis value of the point.
-"*/
 {
 	return [self getCenterX];
 }
 
 
+/*!
+ This method sets the real-space coordinate along the y-axis which is also
+ the 'rows' in the simulation grid.
+ */
 - (void) setY:(float)y
-/*"
-**	This method sets the real-space coordinate along the y-axis which is also
-**	the 'rows' in the simulation grid.
-"*/
 {
 	[self setCenterY:y];
 }
 
 
+/*!
+ This method returns the real-space x-axis value of the point.
+ */
 - (float) getY
-/*"
-**	This method returns the real-space x-axis value of the point.
-"*/
 {
 	return [self getCenterY];
 }

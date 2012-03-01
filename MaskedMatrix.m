@@ -6,10 +6,6 @@
 //  Copyright (c) 2003 The Man from S.P.U.D.. All rights reserved.
 //
 
-// RCS Identification information
-static char *rcsID = "$Id: MaskedMatrix.m,v 1.1 2008/08/07 20:32:58 drbob Exp $";
-static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
-
 // Apple Headers
 
 // System Headers
@@ -32,31 +28,32 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 // Public Macros
 
 
+/*!
+ @class MaskedMatrix
+ This class is exceptionally handy for dealing with values in a matrix
+ that may or may not have been set by the user of this class. The problem
+ with floating point values is that there's no "not set yet" value. This
+ is then solved by bonding together a matrix of doubles and a matrix of
+ BOOLs and then using the BOOLs as a mask into the doubles so that we can
+ be sure when each value is set, and unset.
+ 
+ The workspace uses a few of these masked matrices to hold the properties
+ of the simulation underway. It's a very convenient way to encapsulate
+ the knowledge of "where" things are "supposed" to be, and where they are
+ not.
+ */
 @implementation MaskedMatrix
-/*"
-**	This class is exceptionally handy for dealing with values in a matrix
-**	that may or may not have been set by the user of this class. The problem
-**	with floating point values is that there's no "not set yet" value. This
-**	is then solved by bonding together a matrix of doubles and a matrix of
-**	BOOLs and then using the BOOLs as a mask into the doubles so that we can
-**	be sure when each value is set, and unset.
-**
-**	The workspace uses a few of these masked matrices to hold the properties
-**	of the simulation underway. It's a very convenient way to encapsulate
-**	the knowledge of "where" things are "supposed" to be, and where they are
-**	not.
-"*/
 
 //----------------------------------------------------------------------------
 //               Accessor Methods
 //----------------------------------------------------------------------------
 
+/*!
+ This method gets the number of rows in the currently defined and
+ allocated matrix. If there is no currently defined matrix, this method
+ will return -1.
+ */
 - (int) getRowCount
-/*"
-**	This method gets the number of rows in the currently defined and
-**	allocated matrix. If there is no currently defined matrix, this method
-**	will return -1.
-"*/
 {
 	int			retval = -1;
 	if (_data != nil) {
@@ -66,12 +63,12 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method gets the number of columns in the currently defined and
+ allocated matrix. If there is no currently defined matrix, this method
+ will return -1;
+ */
 - (int) getColCount
-/*"
-**	This method gets the number of columns in the currently defined and
-**	allocated matrix. If there is no currently defined matrix, this method
-**	will return -1;
-"*/
 {
 	int			retval = -1;
 	if (_data != nil) {
@@ -81,28 +78,28 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method gets the value of the point referenced by 'p' or 0 if the
+ point 'p' is not yet set in this matrix. Use the -haveValueAt: method
+ to determine if there is supposed to be a vlid value in the matrix at
+ this point. Because an NSPoint holds floating point values, they will
+ simply be converted to ints before the row/column lookup is done.
+ */
 - (double) getValueAt:(NSPoint)p
-/*"
-**	This method gets the value of the point referenced by 'p' or 0 if the
-**	point 'p' is not yet set in this matrix. Use the -haveValueAt: method
-**	to determine if there is supposed to be a vlid value in the matrix at
-**	this point. Because an NSPoint holds floating point values, they will
-**	simply be converted to ints before the row/column lookup is done.
-"*/
 {
 	return [self getValueAtRow:(int) p.x andCol:(int) p.y];
 }
 
 
+/*!
+ This method gets the valus at the specified row and column of the matrix
+ and returns it to the caller. If the specified point does not exist,
+ we'll log the error, and return a 0 (which doesn't tell you much). It's
+ best to call -haveValueAtRow:andCol: to ensure that the point exists and
+ has a valid value before calling this method - just to be on the safe
+ side.
+ */
 - (double) getValueAtRow:(int)r andCol:(int)c
-/*"
-**	This method gets the valus at the specified row and column of the matrix
-**	and returns it to the caller. If the specified point does not exist,
-**	we'll log the error, and return a 0 (which doesn't tell you much). It's
-**	best to call -haveValueAtRow:andCol: to ensure that the point exists and
-**	has a valid value before calling this method - just to be on the safe
-**	side.
-"*/
 {
 	double		retval = 0.0;
 	if ([self haveValueAtRow:r andCol:c]) {
@@ -112,25 +109,25 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method sets the value 'val' at the point in the matrix specified
+ by the NSPoint, p. Of course, only the integer portion of the NSPoint's
+ values are used, and at the same time the flag is set indicating that
+ this value is valid.
+ */
 - (void) setValue:(double)val at:(NSPoint)p
-/*"
-**	This method sets the value 'val' at the point in the matrix specified
-**	by the NSPoint, p. Of course, only the integer portion of the NSPoint's
-**	values are used, and at the same time the flag is set indicating that
-**	this value is valid.
-"*/
 {
 	[self setValue:val atRow:(int) p.x andCol:(int) p.y];
 }
 
 
+/*!
+ This method sets the value 'val' and the row 'r', and column 'c' in the
+ matrix, assuming that the matrix is large enough to hold this element.
+ If not, then we'll log the error and move on from there. If it's valid,
+ then we'll flag this location in the matrix as containing valid data.
+ */
 - (void) setValue:(double)val atRow:(int)r andCol:(int)c
-/*"
-**	This method sets the value 'val' and the row 'r', and column 'c' in the
-**	matrix, assuming that the matrix is large enough to hold this element.
-**	If not, then we'll log the error and move on from there. If it's valid,
-**	then we'll flag this location in the matrix as containing valid data.
-"*/
 {
 	BOOL			error = NO;
 
@@ -166,25 +163,25 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method returns YES if the current matrix contains a valid value
+ at the location referenced by the NSPoint, p. Of course, only the integer
+ portion of the NSPoint values will be used, but if this method returns
+ YES, then there's something there that the user put there.
+ */
 - (BOOL) haveValueAt:(NSPoint)p
-/*"
-**	This method returns YES if the current matrix contains a valid value
-**	at the location referenced by the NSPoint, p. Of course, only the integer
-**	portion of the NSPoint values will be used, but if this method returns
-**	YES, then there's something there that the user put there.
-"*/
 {
 	return [self haveValueAtRow:(int) p.x andCol:(int) p.y];
 }
 
 
+/*!
+ This method checks to see if the matrix has a vlid value referenced by
+ the supplied row and column. This is important because a lot of the
+ other routines use this guy to see if there's any reason to dig deeper
+ to get a value.
+ */
 - (BOOL) haveValueAtRow:(int)r andCol:(int)c
-/*"
-**	This method checks to see if the matrix has a vlid value referenced by
-**	the supplied row and column. This is important because a lot of the
-**	other routines use this guy to see if there's any reason to dig deeper
-**	to get a value.
-"*/
 {
 	BOOL			error = NO;
 
@@ -221,22 +218,22 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method makes the point in the matrix referenced by the NSPoint, p,
+ no longer 'valid' for the sake of getting values from the matrix.
+ */
 - (void) discardValueAt:(NSPoint)p
-/*"
-**	This method makes the point in the matrix referenced by the NSPoint, p,
-**	no longer 'valid' for the sake of getting values from the matrix.
-"*/
 {
 	[self discardValueAtRow:(int) p.x andCol:(int) p.y];
 }
 
 
+/*!
+ This method makes the point in the matrix referenced by the row and
+ column provided no longer 'valid' for the sake of getting values from
+ the matrix.
+ */
 - (void) discardValueAtRow:(int)r andCol:(int)c
-/*"
-**	This method makes the point in the matrix referenced by the row and
-**	column provided no longer 'valid' for the sake of getting values from
-**	the matrix.
-"*/
 {
 	if ([self haveValueAtRow:r andCol:c]) {
 		_mask[r][c] = NO;
@@ -244,12 +241,12 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method is a handy way to "clear out" this matrix of data without
+ having to step through it one element at a time. It's easier and faster
+ this way.
+ */
 - (void) discardAllValues
-/*"
-**	This method is a handy way to "clear out" this matrix of data without
-**	having to step through it one element at a time. It's easier and faster
-**	this way.
-"*/
 {
 	int		rows = [self getRowCount];
 	int		cols = [self getColCount];
@@ -268,14 +265,14 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 //               Initialization Methods
 //----------------------------------------------------------------------------
 
+/*!
+ This method drops any matrix that might already be allocated in this
+ instance and attempts to allocate a new matrix of the given size. If
+ this is successful, then self is returned. If not, then nil is returned.
+ This method can be called many times in the life of this object, each
+ time resizing to the desired dimensions.
+ */
 - (id) initWithRows:(int)rowCnt andCols:(int)colCnt
-/*"
-**	This method drops any matrix that might already be allocated in this
-**	instance and attempts to allocate a new matrix of the given size. If
-**	this is successful, then self is returned. If not, then nil is returned.
-**	This method can be called many times in the life of this object, each
-**	time resizing to the desired dimensions.
-"*/
 {
 	BOOL			error = NO;
 	int				i = 0;
@@ -371,11 +368,11 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 }
 
 
+/*!
+ This method drops and allocated matrix for this instance, and is used
+ to clean up the memory used and be a good non-leaking citizen.
+ */
 - (void) freeMatrixData
-/*"
-**	This method drops and allocated matrix for this instance, and is used
-**	to clean up the memory used and be a good non-leaking citizen.
-"*/
 {
 	int		i = 0;
 
@@ -416,12 +413,12 @@ static void __AvoidCompilerWarning(void) { if(!rcsID)__AvoidCompilerWarning(); }
 //               NSObject Overridden Methods
 //----------------------------------------------------------------------------
 
+/*!
+ This method is called by the runtime when the released object is about
+ to get cleaned up. This gives us an opportunity to clean up all the
+ memory we're using at the time and be a good citizen.
+ */
 - (void) dealloc
-/*"
-**	This method is called by the runtime when the released object is about
-**	to get cleaned up. This gives us an opportunity to clean up all the
-**	memory we're using at the time and be a good citizen.
-"*/
 {
 	// drop all the memory we're using
 	[self freeMatrixData];
