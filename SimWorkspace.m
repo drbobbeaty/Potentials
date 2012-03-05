@@ -1101,14 +1101,14 @@
  
  Given that we can model the voltage solution as a function of (x,y)
  like:
- V(x,y) = a * x*x + b * x + c + d * y*y + e * y
+     V(x,y) = a * x*x + b * x + c + d * y*y + e * y
  then the coefficients break down to:
- a = (1/(2*hx*hx))*(vl - 2.0*vij + vr)
- b = (1.(2*hx))*(vr - vl)
+     a = (1/(2*hx*hx))*(vl - 2.0*vij + vr)
+     b = (1.(2*hx))*(vr - vl)
  on a uniform mesh in the x-direction.
  
  This then means that:
- ex = b at v=vij
+     ex = b at v=vij
  and similarly easily done for the y-direction.
  */
 - (double) getResultantElectricFieldMagnitudeAtNodeRow:(int)r andCol:(int)c
@@ -1217,10 +1217,10 @@
 		double	hy = [self getWorkspaceSize].height/[self getRowCount];
 
 		// get the column and row limits
-		int			cr = c + 1;
-		int			cl = c - 1;
-		int			rb = r + 1;
-		int			rt = r - 1;
+		int		cr = c + 1;
+		int		cl = c - 1;
+		int		rb = r + 1;
+		int		rt = r - 1;
 		// assume LOS at each border
 		if (cr >= [self getColCount]) cr = [self getColCount] - 2;
 		if (cl <= 0) cl = 1;
