@@ -212,7 +212,7 @@
  on in the 'contentView'. This is important because we need to know
  where it came from to save changes and to write the output.
  */
-- (void) setSrcFileName:(NSString*)name
+- (void) setSrcFileName:(NSURL*)name
 {
 	if (_srcFileName != name) {
 		[_srcFileName release];
@@ -226,7 +226,7 @@
  'contentView' where it's available to be edited, and then run. When
  it's run we'll use this method to see where to put the output files.
  */
-- (NSString*) getSrcFileName
+- (NSURL*) getSrcFileName
 {
 	return _srcFileName;
 }
@@ -305,7 +305,7 @@
 			error = YES;
 			NSLog(@"[MrBig -loadFromFile:] - there is no file specified in the proper location of the UI. Please make sure that there is a file and it's available for reading before trying to load it.");
 		} else {
-			NSString*	contents = [NSString stringWithContentsOfFile:[self getSrcFileName] encoding:NSUTF8StringEncoding error:NULL];
+			NSString*	contents = [NSString stringWithContentsOfURL:[self getSrcFileName] encoding:NSUTF8StringEncoding error:NULL];
 			if (contents == nil) {
 				error = YES;
 				NSLog(@"[MrBig -loadFromFile:] - the file specified in the UI: '%@' could not be read into an NSString. Please make sure that there is a file and it's available for reading before trying to load it.", [self getSrcFileName]);
@@ -347,7 +347,7 @@
 			// nothing? then make the user pick the name
 			[self saveAsToFile:sender];
 		} else {
-			if (![[[self getContentText] string] writeToFile:[self getSrcFileName] atomically:YES encoding:NSUTF8StringEncoding error:NULL]) {
+			if (![[[self getContentText] string] writeToURL:[self getSrcFileName] atomically:YES encoding:NSUTF8StringEncoding error:NULL]) {
 				error = YES;
 				NSLog(@"[MrBig -saveToFile:] - the file '%@'could not be written to. Please check on permissions.", [self getSrcFileName]);
 				// show a decent status to let the user know the issue
@@ -392,7 +392,7 @@
 	 */
 	if (!error) {
 		if ([saveDlg runModal] == NSOKButton) {
-			[self setSrcFileName:[[saveDlg URL] absoluteString]];
+			[self setSrcFileName:[saveDlg URL]];
 		} else {
 			// we have no filename selected, so do nothing else
 			error = true;
@@ -491,7 +491,7 @@
 
 	// to make things simple, output the results of the simulation
 	if (!error) {
-		[self writeOutResults:(NSString*)[[[self getSrcFileName] stringByDeletingPathExtension] stringByAppendingString:@".ans"]];
+		[self writeOutResults:[[[self getSrcFileName] URLByDeletingPathExtension] URLByAppendingPathExtension:@"ans"]];
 	}
 
 	// change the status line to something useful
@@ -647,7 +647,7 @@
 /*!
  This method takes the line from the input source that has the form:
  
- WS <x> <y> <width> <height> <rows> <cols>
+     WS <x> <y> <width> <height> <rows> <cols>
  
  and returns a fully functional workspace based on these parameters. If
  the data is not there or in error, this method will return nil. If
@@ -741,7 +741,7 @@
  can plot them, etc. There's nothing special about the format - tab
  delimited data with column headings in the first row.
  */
-- (void) writeOutResults:(NSString*)filename
+- (void) writeOutResults:(NSURL*)filename
 {
 	BOOL				error = NO;
 	SimWorkspace*		ws = nil;
@@ -775,12 +775,18 @@
 
 	// let's open up a standard C FILE for this as we don't need anything fancy
 	if (!error) {
-		FILE	*all = fopen([filename UTF8String], "w");
-		FILE	*volt = fopen([[filename stringByAppendingString:@"_v.txt"] UTF8String], "w");
-		FILE	*mage = fopen([[filename stringByAppendingString:@"_e.txt"] UTF8String], "w");
-		if ((all == NULL) || (volt == NULL) || (mage == NULL)) {
+		FILE	*all = fopen([[filename path] UTF8String], "w");
+		FILE	*volt = fopen([[[filename path] stringByAppendingString:@"_v.txt"] UTF8String], "w");
+		FILE	*mage = fopen([[[filename path] stringByAppendingString:@"_e.txt"] UTF8String], "w");
+		if (all == NULL) {
 			error = YES;
-			NSLog(@"[MrBig -writeOutResults:] - the file: '%@' could not be opened for writing out the results. This is a serious problem that needs to be looked into.", filename);
+			NSLog(@"[MrBig -writeOutResults:] - the file: '%@' could not be opened for writing out the results. This is a serious problem that needs to be looked into.", [filename path]);
+		} else if (volt == NULL) {
+			error = YES;
+			NSLog(@"[MrBig -writeOutResults:] - the file: '%@' could not be opened for writing out the results. This is a serious problem that needs to be looked into.", [[filename URLByAppendingPathComponent:@"_v.txt"] path]);
+		} else if (mage == NULL) {
+			error = YES;
+			NSLog(@"[MrBig -writeOutResults:] - the file: '%@' could not be opened for writing out the results. This is a serious problem that needs to be looked into.", [[filename URLByAppendingPathComponent:@"_e.txt"] path]);
 		} else {
 			int		r = 0;
 			int		c = 0;
