@@ -45,7 +45,7 @@
 	IBOutlet NSTextField*			_statusLine;
 	IBOutlet NSScrollView*			_contentView;
 	SimWorkspace*					_workspace;
-	NSString*						_srcFileName;
+	NSURL*							_srcFileName;
 }
 
 //----------------------------------------------------------------------------
@@ -152,14 +152,14 @@
  on in the 'contentView'. This is important because we need to know
  where it came from to save changes and to write the output.
  */
-- (void) setSrcFileName:(NSString*)name;
+- (void) setSrcFileName:(NSURL*)name;
 
 /*!
  This method returns the name of the file whose contents are in the
  'contentView' where it's available to be edited, and then run. When
  it's run we'll use this method to see where to put the output files.
  */
-- (NSString*) getSrcFileName;
+- (NSURL*) getSrcFileName;
 
 //----------------------------------------------------------------------------
 //					IB Actions
@@ -262,7 +262,7 @@
 /*!
  This method takes the line from the input source that has the form:
  
- WS <x> <y> <width> <height> <rows> <cols>
+     WS <x> <y> <width> <height> <rows> <cols>
  
  and returns a fully functional workspace based on these parameters. If
  the data is not there or in error, this method will return nil. If
@@ -276,7 +276,7 @@
  can plot them, etc. There's nothing special about the format - tab
  delimited data with column headings in the first row.
  */
-- (void) writeOutResults:(NSString*)filename;
+- (void) writeOutResults:(NSURL*)filename;
 
 //----------------------------------------------------------------------------
 //					NSObject Overridden Methods
