@@ -68,6 +68,7 @@
 		3274023A045D947E00B4F370 /* MaskedMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MaskedMatrix.m; sourceTree = "<group>"; };
 		327DC2332264BEC60010C706 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		327DC2342264C5600010C706 /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		327DC2362264D77E0010C706 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Potentials_Prefix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Potentials_Prefix.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -140,6 +141,7 @@
 		29B97314FDCFA39411CA2CEA /* Potentials */ = {
 			isa = PBXGroup;
 			children = (
+				327DC2362264D77E0010C706 /* README.md */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
