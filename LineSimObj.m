@@ -393,7 +393,7 @@
 		one.x = [ws getColForXValue:one.x];
 		one.y = [ws getRowForYValue:one.y];
 		// now see which axis has the greater movement
-		if (abs(zero.x - one.x) > abs(zero.y - one.y)) {
+		if (fabs(zero.x - one.x) > fabs(zero.y - one.y)) {
 			int			r = 0;
 			int			c = 0;
 			/*

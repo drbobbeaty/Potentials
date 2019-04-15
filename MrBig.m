@@ -270,7 +270,7 @@
 	 * process the files.
 	 */
 	if (!error) {
-		if ([openDlg runModal] == NSOKButton) {
+		if ([openDlg runModal] == NSModalResponseOK) {
 			/*
 			 * Get an array containing the full filenames of all
 			 * files and directories selected.
@@ -391,7 +391,7 @@
 	 * read the file name and use it.
 	 */
 	if (!error) {
-		if ([saveDlg runModal] == NSOKButton) {
+		if ([saveDlg runModal] == NSModalResponseOK) {
 			[self setSrcFileName:[saveDlg URL]];
 		} else {
 			// we have no filename selected, so do nothing else

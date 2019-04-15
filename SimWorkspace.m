@@ -7,7 +7,8 @@
 //
 
 // Apple Headers
-#import <vecLib/clapack.h>
+//#import <vecLib/clapack.h>
+#import <Accelerate/Accelerate.h>
 
 // System Headers
 #import <math.h>
