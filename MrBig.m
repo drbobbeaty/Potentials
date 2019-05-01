@@ -183,6 +183,31 @@
 
 
 /*!
+ This method sets the ResultsView that will be used in the application
+ to show the user the results from the simulation. This method will
+ almost certainly never get called as the connection is established
+ in InterfaceBuilder, but for the sake of completness, here it is.
+ */
+- (void) setResultsView:(ResultsView*)view
+{
+	if (_resultsView != view) {
+		[_resultsView release];
+		_resultsView = [view retain];
+	}
+}
+
+
+/*!
+ This method returns the ResultsView that will be used in the application
+ to show the user the results from the simulation.
+ */
+- (ResultsView*) getResultsView
+{
+	return _resultsView;
+}
+
+
+/*!
  This method sets the workspace that will be used for subsequent sims
  of the objects in the associated factory's inventory. The two pieces
  need to work together through this controller to get the job done.
@@ -517,7 +542,10 @@
 	[[self getContentText] setFont:[NSFont fontWithName:@"Consolas" size:10.0]];
 	// clear out the content area as we wish it to appear clean
 	[[self getContentText] setString:@""];
-	
+
+	// make the view a red color to see where it really is
+	[[self getResultsView] drawTestPattern];
+
 	// Set the status to a simple 'Ready'
 	[self showStatus:@"Ready"];
 }

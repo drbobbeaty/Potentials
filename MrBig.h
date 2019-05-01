@@ -19,6 +19,7 @@
 #import "BaseSimObj.h"
 #import "SimWorkspace.h"
 #import "SimObjFactory.h"
+#import "ResultsView.h"
 
 // Superclass Headers
 
@@ -44,6 +45,7 @@
 	IBOutlet NSProgressIndicator*	_progressBar;
 	IBOutlet NSTextField*			_statusLine;
 	IBOutlet NSScrollView*			_contentView;
+	IBOutlet ResultsView*			_resultsView;
 	SimWorkspace*					_workspace;
 	NSURL*							_srcFileName;
 }
@@ -132,6 +134,20 @@
  simulation source for viewing/creating/editing.
  */
 - (NSTextView*) getContentText;
+
+/*!
+ This method sets the ResultsView that will be used in the application
+ to show the user the results from the simulation. This method will
+ almost certainly never get called as the connection is established
+ in InterfaceBuilder, but for the sake of completness, here it is.
+ */
+- (void) setResultsView:(ResultsView*)view;
+
+/*!
+ This method returns the ResultsView that will be used in the application
+ to show the user the results from the simulation.
+ */
+- (ResultsView*) getResultsView;
 
 /*!
  This method sets the workspace that will be used for subsequent sims

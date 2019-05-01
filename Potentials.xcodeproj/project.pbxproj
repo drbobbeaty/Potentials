@@ -34,6 +34,8 @@
 		3216BCFF0C354713007FC0F8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		3216BD5C0C35875B007FC0F8 /* Potentials.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3216BD5B0C35875B007FC0F8 /* Potentials.icns */; };
 		323D06182279D88A00D745C0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 323D06162279D88A00D745C0 /* MainMenu.xib */; };
+		323D061B2279EB8400D745C0 /* ResultsView.h in Headers */ = {isa = PBXBuildFile; fileRef = 323D06192279EB8400D745C0 /* ResultsView.h */; };
+		323D061C2279EB8400D745C0 /* ResultsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 323D061A2279EB8400D745C0 /* ResultsView.m */; };
 		327DC2352264C5600010C706 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 327DC2342264C5600010C706 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
@@ -64,6 +66,8 @@
 		323BFAB10454868A00B4F328 /* MrBig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MrBig.h; sourceTree = "<group>"; };
 		323BFAB20454868A00B4F328 /* MrBig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MrBig.m; sourceTree = "<group>"; };
 		323D06172279D88A00D745C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		323D06192279EB8400D745C0 /* ResultsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResultsView.h; sourceTree = "<group>"; };
+		323D061A2279EB8400D745C0 /* ResultsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResultsView.m; sourceTree = "<group>"; };
 		32740239045D947E00B4F370 /* MaskedMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaskedMatrix.h; sourceTree = "<group>"; };
 		3274023A045D947E00B4F370 /* MaskedMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MaskedMatrix.m; sourceTree = "<group>"; };
 		327DC2332264BEC60010C706 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -109,6 +113,8 @@
 				32063589046AD94800B4F327 /* SimWorkspace_Protected.m */,
 				32740239045D947E00B4F370 /* MaskedMatrix.h */,
 				3274023A045D947E00B4F370 /* MaskedMatrix.m */,
+				323D06192279EB8400D745C0 /* ResultsView.h */,
+				323D061A2279EB8400D745C0 /* ResultsView.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -188,6 +194,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				323D061B2279EB8400D745C0 /* ResultsView.h in Headers */,
 				3216BCE30C354713007FC0F8 /* Potentials_Prefix.h in Headers */,
 				3216BCE40C354713007FC0F8 /* BaseSimObj.h in Headers */,
 				3216BCE50C354713007FC0F8 /* CircularSimObj.h in Headers */,
@@ -285,6 +292,7 @@
 				3216BCF80C354713007FC0F8 /* SimObjFactory.m in Sources */,
 				3216BCF90C354713007FC0F8 /* SimWorkspace.m in Sources */,
 				3216BCFA0C354713007FC0F8 /* MrBig.m in Sources */,
+				323D061C2279EB8400D745C0 /* ResultsView.m in Sources */,
 				3216BCFB0C354713007FC0F8 /* MaskedMatrix.m in Sources */,
 				3216BCFC0C354713007FC0F8 /* SimWorkspace_Protected.m in Sources */,
 			);

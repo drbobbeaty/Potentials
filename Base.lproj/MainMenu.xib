@@ -14,7 +14,7 @@
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="304" y="556" width="365" height="325"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
-            <value key="minSize" type="size" width="365" height="190"/>
+            <value key="minSize" type="size" width="365" height="325"/>
             <view key="contentView" id="248">
                 <rect key="frame" x="0.0" y="0.0" width="365" height="325"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -91,6 +91,10 @@
                         <rect key="frame" x="2" y="2" width="16" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     </progressIndicator>
+                    <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="pgx-hh-Ecg" customClass="ResultsView">
+                        <rect key="frame" x="0.0" y="117" width="366" height="208"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                    </customView>
                 </subviews>
             </view>
             <point key="canvasLocation" x="139.5" y="214.5"/>
@@ -329,6 +333,7 @@
                 <outlet property="_contentView" destination="249" id="vdP-Y3-AQ8"/>
                 <outlet property="_factory" destination="319" id="321"/>
                 <outlet property="_progressBar" destination="255" id="aPq-Jf-BDs"/>
+                <outlet property="_resultsView" destination="pgx-hh-Ecg" id="DNX-Ma-5Wy"/>
                 <outlet property="_statusLine" destination="253" id="iT0-3X-bP8"/>
             </connections>
         </customObject>
