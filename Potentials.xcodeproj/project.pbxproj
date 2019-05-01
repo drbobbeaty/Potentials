@@ -18,7 +18,6 @@
 		3216BCEB0C354713007FC0F8 /* MaskedMatrix.h in Headers */ = {isa = PBXBuildFile; fileRef = 32740239045D947E00B4F370 /* MaskedMatrix.h */; };
 		3216BCEC0C354713007FC0F8 /* SimWorkspace_Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = 32063588046AD94800B4F327 /* SimWorkspace_Protected.h */; };
 		3216BCED0C354713007FC0F8 /* RectangularSimObj.h in Headers */ = {isa = PBXBuildFile; fileRef = 323BFA99045478B900B4F328 /* RectangularSimObj.h */; };
-		3216BCEF0C354713007FC0F8 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 29B97318FDCFA39411CA2CEA /* MainMenu.nib */; };
 		3216BCF00C354713007FC0F8 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		3216BCF20C354713007FC0F8 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		3216BCF30C354713007FC0F8 /* BaseSimObj.m in Sources */ = {isa = PBXBuildFile; fileRef = 323BFA960454771100B4F328 /* BaseSimObj.m */; };
@@ -34,6 +33,7 @@
 		3216BCFE0C354713007FC0F8 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		3216BCFF0C354713007FC0F8 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29B97325FDCFA39411CA2CEA /* Foundation.framework */; };
 		3216BD5C0C35875B007FC0F8 /* Potentials.icns in Resources */ = {isa = PBXBuildFile; fileRef = 3216BD5B0C35875B007FC0F8 /* Potentials.icns */; };
+		323D06182279D88A00D745C0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 323D06162279D88A00D745C0 /* MainMenu.xib */; };
 		327DC2352264C5600010C706 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 327DC2342264C5600010C706 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
@@ -63,7 +63,7 @@
 		323BFAAE0454853900B4F328 /* SimWorkspace.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SimWorkspace.m; sourceTree = "<group>"; };
 		323BFAB10454868A00B4F328 /* MrBig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MrBig.h; sourceTree = "<group>"; };
 		323BFAB20454868A00B4F328 /* MrBig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MrBig.m; sourceTree = "<group>"; };
-		324312A621A48C940073FB48 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		323D06172279D88A00D745C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		32740239045D947E00B4F370 /* MaskedMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaskedMatrix.h; sourceTree = "<group>"; };
 		3274023A045D947E00B4F370 /* MaskedMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MaskedMatrix.m; sourceTree = "<group>"; };
 		327DC2332264BEC60010C706 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -164,8 +164,8 @@
 			isa = PBXGroup;
 			children = (
 				3216BD5B0C35875B007FC0F8 /* Potentials.icns */,
+				323D06162279D88A00D745C0 /* MainMenu.xib */,
 				3216BD050C354713007FC0F8 /* Info.plist */,
-				29B97318FDCFA39411CA2CEA /* MainMenu.nib */,
 				089C165CFE840E0CC02AAC07 /* InfoPlist.strings */,
 			);
 			name = Resources;
@@ -263,9 +263,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3216BCEF0C354713007FC0F8 /* MainMenu.nib in Resources */,
 				3216BCF00C354713007FC0F8 /* InfoPlist.strings in Resources */,
 				3216BD5C0C35875B007FC0F8 /* Potentials.icns in Resources */,
+				323D06182279D88A00D745C0 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,12 +301,12 @@
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
-		29B97318FDCFA39411CA2CEA /* MainMenu.nib */ = {
+		323D06162279D88A00D745C0 /* MainMenu.xib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				324312A621A48C940073FB48 /* Base */,
+				323D06172279D88A00D745C0 /* Base */,
 			);
-			name = MainMenu.nib;
+			name = MainMenu.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
