@@ -9,6 +9,7 @@
 // Apple Headers
 
 // System Headers
+#include <math.h>
 
 // Third Party Headers
 
@@ -104,6 +105,52 @@
 	double		retval = 0.0;
 	if ([self haveValueAtRow:r andCol:c]) {
 		retval = _data[r][c];
+	}
+	return retval;
+}
+
+
+/*!
+ This method will return the maximum value in the matrix as a single
+ value so that users don't have to scan all the values themselves to
+ get the limits on the data. If there are no values in the matrix, then
+ NAN will be returned, and can be tested with isnan().
+ */
+- (double) getMaxValue
+{
+	double	retval = NAN;
+	int		rows = [self getRowCount];
+	int		cols = [self getColCount];
+
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (_mask[i][j] && (!isnan(_data[i][j]) && !isinf(_data[i][j])) && (isnan(retval) || (retval < _data[i][j]))) {
+				retval = _data[i][j];
+			}
+		}
+	}
+	return retval;
+}
+
+
+/*!
+ This method will return the minimum value in the matrix as a single
+ value so that users don't have to scan all the values themselves to
+ get the limits on the data. If there are no values in the matrix, then
+ NAN will be returned, and can be tested with isnan().
+ */
+- (double) getMinValue
+{
+	double	retval = NAN;
+	int		rows = [self getRowCount];
+	int		cols = [self getColCount];
+
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
+			if (_mask[i][j] && (!isnan(_data[i][j]) && !isinf(_data[i][j])) && (isnan(retval) || (_data[i][j] < retval))) {
+				retval = _data[i][j];
+			}
+		}
 	}
 	return retval;
 }

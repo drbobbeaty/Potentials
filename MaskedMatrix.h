@@ -88,6 +88,22 @@
 - (double) getValueAtRow:(int)r andCol:(int)c;
 
 /*!
+ This method will return the maximum value in the matrix as a single
+ value so that users don't have to scan all the values themselves to
+ get the limits on the data. If there are no values in the matrix, then
+ NAN will be returned, and can be tested with isnan().
+ */
+- (double) getMaxValue;
+
+/*!
+ This method will return the minimum value in the matrix as a single
+ value so that users don't have to scan all the values themselves to
+ get the limits on the data. If there are no values in the matrix, then
+ NAN will be returned, and can be tested with isnan().
+ */
+- (double) getMinValue;
+
+/*!
  This method sets the value 'val' at the point in the matrix specified
  by the NSPoint, p. Of course, only the integer portion of the NSPoint's
  values are used, and at the same time the flag is set indicating that

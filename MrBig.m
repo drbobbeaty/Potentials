@@ -516,6 +516,7 @@
 
 	// to make things simple, output the results of the simulation
 	if (!error) {
+		[[self getResultsView] plotVoltage:ws];
 		[self writeOutResults:[[[self getSrcFileName] URLByDeletingPathExtension] URLByAppendingPathExtension:@"ans"]];
 	}
 
