@@ -90,8 +90,6 @@
 
 	if (!error) {
 		double	v = 0.0;
-
-		NSLog(@"[ResultsView -plotVoltage:] - creating the plot data (%dx%d) for the voltage", _rowCnt, _colCnt);
 		// now let's loop over all the points and write out what we want...
 		for (int r = 0; r < _rowCnt; r++) {
 			for (int c = 0; c < _colCnt; c++) {
@@ -379,11 +377,6 @@
 				}
 			}
 		}
-		// ********** Your drawing code here **********
-//	CGContextSetRGBFillColor(myContext, 1, 0, 0, 1);
-//	CGContextFillRect(myContext, CGRectMake (0, 0, 200, 100 ));
-//	CGContextSetRGBFillColor(myContext, 0, 0, 1, .5);
-//	CGContextFillRect(myContext, CGRectMake (0, 0, 100, 200));
 	}
 }
 

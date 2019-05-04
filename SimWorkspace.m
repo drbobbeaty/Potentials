@@ -854,6 +854,9 @@
 		}
 	}
 
+	// start the timer on the solution...
+	NSTimeInterval begin = [NSDate timeIntervalSinceReferenceDate];
+
 	/*
 	 * Next, determine storage format and allocate space for solution set.
 	 * For a more complete description of the arguments and what they are,
@@ -872,6 +875,9 @@
 		if (ab == NULL) {
 			error = YES;
 			NSLog(@"[SimWorkspace -simulateWorkspace] - while trying to allocate the banded A matrix storage (%dx%d) for the solution, we ran into an allocation problem and couldn't get it. Please check into this as soon as possilbe.", ldab, n);
+		} else {
+			// clear out the array with zeros
+			vDSP_vclrD(ab, 1, ldab*n);
 		}
 	}
 	__CLPK_integer		ldb = n;
@@ -884,6 +890,9 @@
 			// ...and log the error
 			error = YES;
 			NSLog(@"[SimWorkspace -simulateWorkspace] - while trying to allocate the RHS b matrix storage (%dx%d) for the solution, we ran into an allocation problem and couldn't get it. Please check into this as soon as possilbe.", ldb, nrhs);
+		} else {
+			// clear out the vector with zeros
+			vDSP_vclrD(b, 1, ldab*nrhs);
 		}
 	}
 	__CLPK_integer		*ipiv = NULL;
@@ -896,6 +905,10 @@
 			// ...and log the error
 			error = YES;
 			NSLog(@"[SimWorkspace -simulateWorkspace] - while trying to allocate the ipivot storage (%dx1) for the solution, we ran into an allocation problem and couldn't get it. Please check into this as soon as possilbe.", n);
+		} else {
+			// clear out the vector with zeros
+			int		zero = 0;
+			vDSP_vfilli(&zero, ipiv, 1, n);
 		}
 	}
 	
@@ -1032,6 +1045,8 @@
 		} else if (info > 0) {
 			error = YES;
 			NSLog(@"[SimWorkspace -simulateWorkspace] - diagonal #%d is zero indicating singularity which shouldn't happen.", info);
+		} else {
+			NSLog(@"[SimWorkspace -simulateWorkspace] - solution took %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 		}
 	}
 
@@ -1063,7 +1078,7 @@
 			[self _setResultantVoltage:rv];
 		}
 	}
-	
+
 	// in the end, we can release what it is that we don't need
 	if (ipiv != NULL) {
 		free(ipiv);
