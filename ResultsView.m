@@ -357,8 +357,12 @@
 
 	// plot all the data on a uniform grid
 	CGContextRef	myContext = nil;
-	NSColor*		clow = [NSColor redColor];
-	NSColor*		chigh = [NSColor greenColor];
+	NSColor*		spectrum[] = {[NSColor redColor],
+								  [NSColor orangeColor],
+								  [NSColor yellowColor],
+								  [NSColor cyanColor]};
+	int 			stages = 4;
+	double			dc = 1.0/(stages - 1);
 	if (_values != nil) {
 		NSLog(@"[ResultsView -drawRect:] - starting to draw the data...");
 		myContext = [[NSGraphicsContext currentContext] CGContext];
@@ -367,9 +371,14 @@
 		CGFloat		gs = MIN(dx, dy);
 		NSColor*	gc = nil;
 		CGFloat		red, grn, blu, alph;
+		double		x = 0.0;
+		int 		ilow = 0;
 		for (int r = 0; r < _rowCnt; r++) {
 			for (int c = 0; c < _colCnt; c++) {
-				gc = [ResultsView interpolate:_values[r][c] withColorsBetween:clow and:chigh];
+				x = _values[r][c];
+				ilow = MIN((int)(x/dc), (stages-2));
+				x -= ilow * dc;
+				gc = [ResultsView interpolate:(x/dc) withColorsBetween:spectrum[ilow] and:spectrum[ilow+1]];
 				if (gc) {
 					[gc getRed:(&red) green:(&grn) blue:(&blu) alpha:(&alph)];
 					CGContextSetRGBFillColor(myContext, red, grn, blu, alph);
