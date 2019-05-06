@@ -106,6 +106,62 @@
 }
 
 
+/*!
+ This method takes the provided SimWorkspace and plots the Electric Field
+ as a function of x and y, based on the row, col organization of the Voltage
+ data within the SimWorkspace.
+ */
+- (void) plotElectricField:(SimWorkspace*) workspace
+{
+	BOOL				error = NO;
+
+	// first, make sure that there's a workspace to plot
+	if (!error) {
+		if (workspace == nil) {
+			error = YES;
+			NSLog(@"[ResultsView -plotElectricField:] - no simulation workspace was passed in. You need to make sure to pass in a valid simulation workspace when calling this method.");
+		}
+	}
+	// ...and that it's got results to output - and pick up the limits as well
+	double  Emax = NAN;
+	double  Emin = NAN;
+	if (!error) {
+		if ([workspace getResultantElectricFieldMagnitude] == nil) {
+			error = YES;
+			NSLog(@"[ResultsView -plotElectricField:] - there are no resultant electric field data for the simulation workspace defined at this time. You need to make sure to simulate the workspace by -runSim: and then call this method.");
+		} else {
+			// get the limits for the colorization of the data
+			Emax = [[workspace getResultantElectricFieldMagnitude] getMaxValue];
+			Emin = [[workspace getResultantElectricFieldMagnitude] getMinValue];
+		}
+	}
+
+	// time to initialize the plotting data for the results
+	if (!error) {
+		if ([self initWithRows:[workspace getRowCount] andCols:[workspace getColCount]] == nil) {
+			error = YES;
+			NSLog(@"[ResultsView -plotElectricField:] - space for the plotting display data could not be allocated.");
+		}
+	}
+
+	if (!error) {
+		double	em = 0.0;
+		// now let's loop over all the points and write out what we want...
+		for (int r = 0; r < _rowCnt; r++) {
+			for (int c = 0; c < _colCnt; c++) {
+				// now get the results at this node
+				em = [workspace getResultantElectricFieldMagnitudeAtNodeRow:r andCol:c];
+				// save all this for drawing
+				_values[r][c] = (em - Emin)/(Emax - Emin);
+			}
+		}
+	}
+
+	[self setNeedsDisplay:YES];
+	[self display];
+}
+
+
 //----------------------------------------------------------------------------
 //               Linear Interpolation of Color Methods
 //----------------------------------------------------------------------------

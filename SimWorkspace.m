@@ -467,7 +467,7 @@
 {
 	double			retval = 0.0;
 	if ([self getResultantVoltage] == nil) {
-		NSLog(@"[SimWorkspace -getResultantVoltage:atNode:] - the simulated results for the potential matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+		NSLog(@"[SimWorkspace -getResultantVoltageAtNode:] - the simulated results for the potential matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
 	} else {
 		retval = [[self getResultantVoltage] getValueAt:p];
 	}
@@ -483,9 +483,109 @@
 {
 	double			retval = 0.0;
 	if ([self getResultantVoltage] == nil) {
-		NSLog(@"[SimWorkspace -getResultantVoltage:atNodeRow:andCol:] - the simulated results for the potential matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+		NSLog(@"[SimWorkspace -getResultantVoltageAtNodeRow:andCol:] - the simulated results for the potential matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
 	} else {
 		retval = [[self getResultantVoltage] getValueAtRow:r andCol:c];
+	}
+	return retval;
+}
+
+
+/*!
+ This method gets the matrix of results from the simulation and will return
+ nil until there are simulation results to present. Not that this is a great
+ way to check if the simulation has been run, but it's certainly a possible
+ use for this method. This is just the magnitude of the field, and there is
+ another call for the direction.
+ */
+- (MaskedMatrix*) getResultantElectricFieldMagnitude
+{
+	return _resultantElectricFieldMagnitude;
+}
+
+
+/*!
+ This method gets the magnitude of the simulated electric field at the
+ point in the simulation grid indicated by the integer values of the
+ passed-in point.
+ */
+- (double) getResultantElectricFieldMagnitudeAtNode:(NSPoint)p
+{
+	double			retval = 0.0;
+	if ([self getResultantElectricFieldMagnitude] == nil) {
+		NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNode:] - the simulated results for the electric field magnitude matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+	} else {
+		retval = [[self getResultantElectricFieldMagnitude] getValueAt:p];
+	}
+	return retval;
+}
+
+
+/*!
+ This method gets the magnitude of the simulated electric field at the
+ row and column in the simulation grid indicated by the integer values
+ passed-in.
+ */
+- (double) getResultantElectricFieldMagnitudeAtNodeRow:(int)r andCol:(int)c
+{
+	double			retval = 0.0;
+	if ([self getResultantVoltage] == nil) {
+		NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNodeRow:andCol:] - the simulated results for the electric field magnitude matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+	} else {
+		retval = [[self getResultantElectricFieldMagnitude] getValueAtRow:r andCol:c];
+	}
+	return retval;
+}
+
+
+/*!
+ This method gets the matrix of results from the simulation and will return
+ nil until there are simulation results to present. Not that this is a great
+ way to check if the simulation has been run, but it's certainly a possible
+ use for this method. This is just the direction of the field, and there is
+ another call for the magnitude.
+ */
+- (MaskedMatrix*) getResultantElectricFieldDirection
+{
+	return _resultantElectricFieldDirection;
+}
+
+
+/*!
+ This method gets the direction in degrees of the unit circle of the
+ simulated electric field at the point in the simulation grid indicated
+ by the integer values of the passed-in point. This is nice if you're
+ only really interested in the direction at the point and don't want to
+ convert the entire space or don't care about the magnitude of the field
+ vector.
+ */
+- (double) getResultantElectricFieldDirectionAtNode:(NSPoint)p
+{
+	double			retval = 0.0;
+	if ([self getResultantElectricFieldDirection] == nil) {
+		NSLog(@"[SimWorkspace -getResultantElectricFieldDirectionAtNode:] - the simulated results for the electric field direction matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+	} else {
+		retval = [[self getResultantElectricFieldDirection] getValueAt:p];
+	}
+	return retval;
+}
+
+
+/*!
+ This method gets the direction in radians of the unit circle of the
+ simulated electric field at the row and column in the simulation grid
+ indicated by the integer values passed-in. This is nice if you're
+ only really interested in the direction at the point and don't want to
+ convert the entire space or don't care about the magnitude of the field
+ vector.
+ */
+- (double) getResultantElectricFieldDirectionAtNodeRow:(int)r andCol:(int)c
+{
+	double			retval = 0.0;
+	if ([self getResultantElectricFieldDirection] == nil) {
+		NSLog(@"[SimWorkspace -getResultantElectricFieldDirectionAtNodeRow:andCol:] - the simulated results for the electric field direction matrix is not currently allocated. This means you need to call -simulateWorkspace to calculate the values and set up these matricies properly before you can start getting values from the simulation.");
+	} else {
+		retval = [[self getResultantElectricFieldDirection] getValueAtRow:r andCol:c];
 	}
 	return retval;
 }
@@ -831,6 +931,8 @@
 	[[self getVoltage] discardAllValues];
 	// the results are a little different - we can't have *any*
 	[self _setResultantVoltage:nil];
+	[self _setResultantElectricFieldMagnitude:nil];
+	[self _setResultantElectricFieldDirection:nil];
 }
 
 
@@ -1059,11 +1161,9 @@
 			NSLog(@"[SimWorkspace -simulateWorkspace] - the resultant voltage matrix for the simulation could not be created and this is a serious storage problem. The request was made for a %dx%d sized matrix, and that seems to be too much. Check into this.", [self getRowCount], [self getColCount]);
 		} else {
 			// now fill in all the values from the solution set
-			int		row = 0;
-			int		col = 0;
 			int		ij = 0;
-			for (row = 0; row < [self getRowCount]; row++) {
-				for (col = 0; col < [self getColCount]; col++) {
+			for (int row = 0; row < [self getRowCount]; row++) {
+				for (int col = 0; col < [self getColCount]; col++) {
 					/*
 					 * We need to convert the row and col into a node number based
 					 * on the most efficient banding possible.
@@ -1073,10 +1173,66 @@
 					[rv setValue:b[ij] atRow:row andCol:col];
 				}
 			}
-					
-			// ...and don't forget to save it for the user
-			[self _setResultantVoltage:rv];
 		}
+	}
+
+	// create the storage for the magnitude of the electric field
+	MaskedMatrix*		rem = nil;
+	MaskedMatrix*		red = nil;
+	if (!error && ([self getRowCount] >= 2) && ([self getColCount] >= 2)) {
+		rem = [[[MaskedMatrix alloc] initWithRows:[self getRowCount] andCols:[self getColCount]] autorelease];
+		red = [[[MaskedMatrix alloc] initWithRows:[self getRowCount] andCols:[self getColCount]] autorelease];
+		if ((rem == nil) || (red == nil)) {
+			error = YES;
+			NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitude] - the resultant electric field matrices could not be created and this is a serious storage problem. The request was made for a %dx%d sized matrix, and that seems to be too much. Check into this.", [self getRowCount], [self getColCount]);
+		}
+	}
+
+	// now do the calculations
+	if (!error) {
+		// get the grid spacings in the x and y directions
+		double	hx = [self getWorkspaceSize].width/[self getColCount];
+		double	hy = [self getWorkspaceSize].height/[self getRowCount];
+		// now run through all the points in the workspace and calc each
+		for (int r = 0; r < [self getRowCount]; r++) {
+			for (int c = 0; c < [self getColCount]; c++) {
+				// get the column and row limits
+				int			cr = c + 1;
+				int			cl = c - 1;
+				int			rb = r + 1;
+				int			rt = r - 1;
+				// assume LOS at each border
+				if (cr >= [self getColCount]) cr = [self getColCount] - 2;
+				if (cl <= 0) cl = 1;
+				if (rb >= [self getRowCount]) rb = [self getRowCount] - 2;
+				if (rt <= 0) rt = 1;
+
+				// now get the voltages at the surrounding nodes
+				double	vr = [rv getValueAtRow:r andCol:cr];
+				double	vl = [rv getValueAtRow:r andCol:cl];
+				double	vb = [rv getValueAtRow:rb andCol:c];
+				double	vt = [rv getValueAtRow:rt andCol:c];
+
+				// now get the components of the electric field
+				double	ex = (vr - vl)/(2.0*hx);
+				double	ey = (vb - vt)/(2.0*hy);
+
+				// now get the answer we're looking for
+				[rem setValue:sqrt(ex*ex + ey*ey) atRow:r andCol:c];
+				if ((ex == 0) && (ey == 0)) {
+					[red setValue:0.0 atRow:r andCol:c];
+				} else {
+					[red setValue:atan2(ey, ex) atRow:r andCol:c];
+				}
+			}
+		}
+	}
+
+	// ...and don't forget to save it for the user
+	if (!error) {
+		[self _setResultantVoltage:rv];
+		[self _setResultantElectricFieldMagnitude:rem];
+		[self _setResultantElectricFieldDirection:red];
 	}
 
 	// in the end, we can release what it is that we don't need
@@ -1091,176 +1247,6 @@
 	}
 
 	return !error;
-}
-
-
-/*!
- This method gets the magnitude of the simulated electric field at the
- point in the simulation grid indicated by the integer values of the
- passed-in point. This is nice if you're only really interested in the
- magnitude at the point and don't want to convert the entire space or
- don't care about the direction of the field vector.
- */
-- (double) getResultantElectricFieldMagnitudeAtNode:(NSPoint)p
-{
-	return [self getResultantElectricFieldMagnitudeAtNodeRow:(int)p.x andCol:(int)p.y];
-}
-
-
-/*!
- This method gets the magnitude of the simulated electric field at the
- row and column in the simulation grid indicated by the integer values
- passed-in. This is nice if you're only really interested in the
- magnitude at the point and don't want to convert the entire space or
- don't care about the direction of the field vector.
- 
- Given that we can model the voltage solution as a function of (x,y)
- like:
-     V(x,y) = a * x*x + b * x + c + d * y*y + e * y
- then the coefficients break down to:
-     a = (1/(2*hx*hx))*(vl - 2.0*vij + vr)
-     b = (1.(2*hx))*(vr - vl)
- on a uniform mesh in the x-direction.
- 
- This then means that:
-     ex = b at v=vij
- and similarly easily done for the y-direction.
- */
-- (double) getResultantElectricFieldMagnitudeAtNodeRow:(int)r andCol:(int)c
-{
-	BOOL			error = NO;
-	double		retval = 0.0;
-
-	// make sure we have a properly sized simulation grid
-	if (!error) {
-		if (([self getRowCount] < 2) || ([self getColCount] < 2)) {
-			error = YES;
-			NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNodeRow:andCol:] - the simulation grid needs to be at least two rows and two columns, the current simulation grid is %dx%d which is too small. Please establish a proper sized grid.", [self getRowCount], [self getColCount]);
-		}
-	}
-	
-	// make sure we have something to calculate on
-	if (!error) {
-		if ([self getResultantVoltage] == nil) {
-			error = YES;
-			NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNodeRow:andCol:] - the simulation needs to have been completed to determine any results and this simulation hasn't. Please call -simulateWorkspace after things are set-up and then call this method.");
-		}
-	}
-
-	// now do the calculations
-	if (!error) {
-		// get the grid spacings in the x and y directions
-		double	hx = [self getWorkspaceSize].width/[self getColCount];
-		double	hy = [self getWorkspaceSize].height/[self getRowCount];
-
-		// get the column and row limits
-		int			cr = c + 1;
-		int			cl = c - 1;
-		int			rb = r + 1;
-		int			rt = r - 1;
-		// assume LOS at each border
-		if (cr >= [self getColCount]) cr = [self getColCount] - 2;
-		if (cl <= 0) cl = 1;
-		if (rb >= [self getRowCount]) rb = [self getRowCount] - 2;
-		if (rt <= 0) rt = 1;
-		
-		// now get the voltages at the surrounding nodes
-		double	vr = [[self getResultantVoltage] getValueAtRow:r andCol:cr];
-		double	vl = [[self getResultantVoltage] getValueAtRow:r andCol:cl];
-		double	vb = [[self getResultantVoltage] getValueAtRow:rb andCol:c];
-		double	vt = [[self getResultantVoltage] getValueAtRow:rt andCol:c];
-
-		// now get the components of the electric field
-		double	ex = (vr - vl)/(2.0*hx);
-		double	ey = (vb - vt)/(2.0*hy);
-
-		// now get the answer we're looking for
-		retval = sqrt(ex*ex + ey*ey);
-	}
-
-	return error ? 0.0 : retval;
-}
-
-
-/*!
- This method gets the direction in degrees of the unit circle of the
- simulated electric field at the point in the simulation grid indicated
- by the integer values of the passed-in point. This is nice if you're
- only really interested in the direction at the point and don't want to
- convert the entire space or don't care about the magnitude of the field
- vector.
- */
-- (double) getResultantElectricFieldDirectionAtNode:(NSPoint)p
-{
-	return [self getResultantElectricFieldDirectionAtNodeRow:(int)p.x andCol:(int)p.y];
-}
-
-
-/*!
- This method gets the direction in radians of the unit circle of the
- simulated electric field at the row and column in the simulation grid
- indicated by the integer values passed-in. This is nice if you're
- only really interested in the direction at the point and don't want to
- convert the entire space or don't care about the magnitude of the field
- vector.
- */
-- (double) getResultantElectricFieldDirectionAtNodeRow:(int)r andCol:(int)c
-{
-	BOOL			error = NO;
-	double		retval = 0.0;
-
-	// make sure we have a properly sized simulation grid
-	if (!error) {
-		if (([self getRowCount] < 2) || ([self getColCount] < 2)) {
-			error = YES;
-			NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNodeRow:andCol:] - the simulation grid needs to be at least two rows and two columns, the current simulation grid is %dx%d which is too small. Please establish a proper sized grid.", [self getRowCount], [self getColCount]);
-		}
-	}
-
-	// make sure we have something to calculate on
-	if (!error) {
-		if ([self getResultantVoltage] == nil) {
-			error = YES;
-			NSLog(@"[SimWorkspace -getResultantElectricFieldMagnitudeAtNodeRow:andCol:] - the simulation needs to have been completed to determine any results and this simulation hasn't. Please call -simulateWorkspace after things are set-up and then call this method.");
-		}
-	}
-
-	// now do the calculations
-	if (!error) {
-		// get the grid spacings in the x and y directions
-		double	hx = [self getWorkspaceSize].width/[self getColCount];
-		double	hy = [self getWorkspaceSize].height/[self getRowCount];
-
-		// get the column and row limits
-		int		cr = c + 1;
-		int		cl = c - 1;
-		int		rb = r + 1;
-		int		rt = r - 1;
-		// assume LOS at each border
-		if (cr >= [self getColCount]) cr = [self getColCount] - 2;
-		if (cl <= 0) cl = 1;
-		if (rb >= [self getRowCount]) rb = [self getRowCount] - 2;
-		if (rt <= 0) rt = 1;
-
-		// now get the voltages at the surrounding nodes
-		double	vr = [[self getResultantVoltage] getValueAtRow:r andCol:cr];
-		double	vl = [[self getResultantVoltage] getValueAtRow:r andCol:cl];
-		double	vb = [[self getResultantVoltage] getValueAtRow:rb andCol:c];
-		double	vt = [[self getResultantVoltage] getValueAtRow:rt andCol:c];
-
-		// now get the components of the electric field
-		double	ex = (vr - vl)/(2.0*hx);
-		double	ey = (vb - vt)/(2.0*hy);
-
-		// now get the answer we're looking for
-		if ((ex == 0) && (ey == 0)) {
-			retval = 0;
-		} else {
-			retval = atan2(ey, ex);
-		}
-	}
-
-	return error ? 0.0 : retval;
 }
 
 

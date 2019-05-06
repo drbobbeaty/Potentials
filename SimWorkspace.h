@@ -51,6 +51,8 @@
 	MaskedMatrix*		_er;
 	MaskedMatrix*		_voltage;
 	MaskedMatrix*		_resultantVoltage;
+	MaskedMatrix*		_resultantElectricFieldMagnitude;
+	MaskedMatrix*		_resultantElectricFieldDirection;
 }
 
 //----------------------------------------------------------------------------
@@ -285,6 +287,52 @@
  results of this class and be used for a great many things.
  */
 - (double) getResultantVoltageAtNodeRow:(int)r andCol:(int)c;
+
+/*!
+ This method gets the matrix of results from the simulation and will return
+ nil until there are simulation results to present. Not that this is a great
+ way to check if the simulation has been run, but it's certainly a possible
+ use for this method. This is just the magnitude of the field, and there is
+ another call for the direction.
+ */
+- (MaskedMatrix*) getResultantElectricFieldMagnitude;
+
+/*!
+ This method gets the magnitude of the simulated electric field at the
+ point in the simulation grid indicated by the integer values of the
+ passed-in point.
+ */
+- (double) getResultantElectricFieldMagnitudeAtNode:(NSPoint)p;
+
+/*!
+ This method gets the magnitude of the simulated electric field at the
+ row and column in the simulation grid indicated by the integer values
+ passed-in.
+ */
+- (double) getResultantElectricFieldMagnitudeAtNodeRow:(int)r andCol:(int)c;
+
+/*!
+ This method gets the matrix of results from the simulation and will return
+ nil until there are simulation results to present. Not that this is a great
+ way to check if the simulation has been run, but it's certainly a possible
+ use for this method. This is just the direction of the field, and there is
+ another call for the magnitude.
+ */
+- (MaskedMatrix*) getResultantElectricFieldDirection;
+
+/*!
+ This method gets the direction in degrees of the unit circle of the
+ simulated electric field at the point in the simulation grid indicated
+ by the integer values of the passed-in point.
+ */
+- (double) getResultantElectricFieldDirectionAtNode:(NSPoint)p;
+
+/*!
+ This method gets the direction in radians of the unit circle of the
+ simulated electric field at the row and column in the simulation grid
+ indicated by the integer values passed-in.
+ */
+- (double) getResultantElectricFieldDirectionAtNodeRow:(int)r andCol:(int)c;
 
 //----------------------------------------------------------------------------
 //               Coordinate Mapping Methods

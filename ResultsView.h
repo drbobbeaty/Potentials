@@ -61,6 +61,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void) plotVoltage:(SimWorkspace*) workspace;
 
+/*!
+ This method takes the provided SimWorkspace and plots the Electric Field
+ as a function of x and y, based on the row, col organization of the Voltage
+ data within the SimWorkspace.
+ */
+- (void) plotElectricField:(SimWorkspace*) workspace;
+
 //----------------------------------------------------------------------------
 //               Linear Interpolation of Color Methods
 //----------------------------------------------------------------------------

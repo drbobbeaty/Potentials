@@ -97,4 +97,22 @@
  */
 - (void) _setResultantVoltage:(MaskedMatrix*)results;
 
+/*!
+ This method sets the matrix being used to hold the results of the
+ simulated electric field magnitude values and is usually only done
+ within the simulation methods. The size of this matrix has to match
+ the rows and columns set for this simulation workspace or we're
+ going to have a very messy time sorting things out.
+ */
+- (void) _setResultantElectricFieldMagnitude:(MaskedMatrix*)results;
+
+/*!
+ This method sets the matrix being used to hold the results of the
+ simulated electric field direction values and is usually only done
+ within the simulation methods. The size of this matrix has to match
+ the rows and columns set for this simulation workspace or we're
+ going to have a very messy time sorting things out.
+ */
+- (void) _setResultantElectricFieldDirection:(MaskedMatrix*)results;
+
 @end
