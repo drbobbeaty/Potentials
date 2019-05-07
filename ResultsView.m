@@ -442,6 +442,7 @@
 				}
 			}
 		}
+//		CGContextAddLines(myContext, points, count);
 	}
 }
 

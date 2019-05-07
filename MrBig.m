@@ -208,6 +208,60 @@
 
 
 /*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see V(x,y) plotted from the
+ simulation. This method will almost certainly never get called as the
+ connection is established in InterfaceBuilder, but for the sake of
+ completness, here it is.
+ */
+- (void) setPlotVxy:(NSMenuItem*)item
+{
+	if (_plotVxy != item) {
+		[_plotVxy release];
+		_plotVxy = [item retain];
+	}
+}
+
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see V(x,y) plotted from the
+ simulation.
+ */
+- (NSMenuItem*) getPlotVxy
+{
+	return _plotVxy;
+}
+
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see E(x,y) plotted from the
+ simulation. This method will almost certainly never get called as the
+ connection is established in InterfaceBuilder, but for the sake of
+ completness, here it is.
+ */
+- (void) setPlotExy:(NSMenuItem*)item
+{
+	if (_plotExy != item) {
+		[_plotExy release];
+		_plotExy = [item retain];
+	}
+}
+
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see E(x,y) plotted from the
+ simulation.
+ */
+- (NSMenuItem*) getPlotExy
+{
+	return _plotExy;
+}
+
+
+/*!
  This method sets the workspace that will be used for subsequent sims
  of the objects in the associated factory's inventory. The two pieces
  need to work together through this controller to get the job done.
@@ -516,14 +570,83 @@
 
 	// to make things simple, output the results of the simulation
 	if (!error) {
-//		[[self getResultsView] plotVoltage:ws];
-		[[self getResultsView] plotElectricField:ws];
+		if ([[self getPlotVxy] state] == 1) {
+			[[self getResultsView] plotVoltage:ws];
+		} else {
+			[[self getResultsView] plotElectricField:ws];
+		}
 		[self writeOutResults:[[[self getSrcFileName] URLByDeletingPathExtension] URLByAppendingPathExtension:@"ans"]];
 	}
 
 	// change the status line to something useful
 	if (!error) {
 		[self showStatus:@"Done with simulation"];
+	}
+}
+
+
+/*!
+ This method will set the state of the NSMenuItems saying that the output
+ of the simulation should be plotting V(x,y) - and if the current plot is
+ E(x,y), then re-plot the simulation as V(x,y).
+ */
+- (IBAction) plotVxy:(id)sender
+{
+	BOOL				error = NO;
+
+	SimWorkspace*		ws = nil;
+	// first, make sure we have a workspace to use
+	if (!error) {
+		ws = [self getWorkspace];
+		if (ws == nil) {
+			error = YES;
+			NSLog(@"[MrBig -plotVxy:] - there is no defined workspace with which to run this simulation. Please make sure there is before calling this method.");
+		}
+	}
+
+	// next, see if we need to switch views
+	if (!error) {
+		if ([[self getPlotExy] state] == 1) {
+			[[self getPlotVxy] setState:1];
+			[[self getPlotExy] setState:0];
+			// plot the Voltage on the workspace
+			if ([ws getResultantVoltage] != nil) {
+				[[self getResultsView] plotVoltage:ws];
+			}
+		}
+	}
+}
+
+
+/*!
+ This method will set the state of the NSMenuItems saying that the output
+ of the simulation should be plotting E(x,y) - and if the current plot is
+ V(x,y), then re-plot the simulation as E(x,y).
+ */
+- (IBAction) plotExy:(id)sender
+{
+	BOOL				error = NO;
+
+	SimWorkspace*		ws = nil;
+	// first, make sure we have a workspace to use
+	if (!error) {
+		ws = [self getWorkspace];
+		if (ws == nil) {
+			error = YES;
+			NSLog(@"[MrBig -plotExy:] - there is no defined workspace with which to run this simulation. Please make sure there is before calling this method.");
+		}
+	}
+
+	// next, see if we need to switch views
+	if (!error) {
+		if ([[self getPlotVxy] state] == 1) {
+			[[self getPlotVxy] setState:0];
+			[[self getPlotExy] setState:1];
+			// plot the Electric Field on the workspace
+			if ([ws getResultantVoltage] != nil) {
+				[[self getResultsView] plotElectricField:ws];
+			}
+		}
 	}
 }
 

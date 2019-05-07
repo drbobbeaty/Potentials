@@ -477,56 +477,6 @@
  */
 - (BOOL) simulateWorkspace;
 
-/*!
- This method gets the magnitude of the simulated electric field at the
- point in the simulation grid indicated by the integer values of the
- passed-in point. This is nice if you're only really interested in the
- magnitude at the point and don't want to convert the entire space or
- don't care about the direction of the field vector.
- */
-- (double) getResultantElectricFieldMagnitudeAtNode:(NSPoint)p;
-
-/*!
- This method gets the magnitude of the simulated electric field at the
- row and column in the simulation grid indicated by the integer values
- passed-in. This is nice if you're only really interested in the
- magnitude at the point and don't want to convert the entire space or
- don't care about the direction of the field vector.
- 
- Given that we can model the voltage solution as a function of (x,y)
- like:
- V(x,y) = a * x*x + b * x + c + d * y*y + e * y
- then the coefficients break down to:
- a = (1/(2*hx*hx))*(vl - 2.0*vij + vr)
- b = (1.(2*hx))*(vr - vl)
- on a uniform mesh in the x-direction.
- 
- This then means that:
- ex = b at v=vij
- and similarly easily done for the y-direction.
- */
-- (double) getResultantElectricFieldMagnitudeAtNodeRow:(int)r andCol:(int)c;
-
-/*!
- This method gets the direction in degrees of the unit circle of the
- simulated electric field at the point in the simulation grid indicated
- by the integer values of the passed-in point. This is nice if you're
- only really interested in the direction at the point and don't want to
- convert the entire space or don't care about the magnitude of the field
- vector.
- */
-- (double) getResultantElectricFieldDirectionAtNode:(NSPoint)p;
-
-/*!
- This method gets the direction in radians of the unit circle of the
- simulated electric field at the row and column in the simulation grid
- indicated by the integer values passed-in. This is nice if you're
- only really interested in the direction at the point and don't want to
- convert the entire space or don't care about the magnitude of the field
- vector.
- */
-- (double) getResultantElectricFieldDirectionAtNodeRow:(int)r andCol:(int)c;
-
 //----------------------------------------------------------------------------
 //               NSObject Overridden Methods
 //----------------------------------------------------------------------------

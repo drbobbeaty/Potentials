@@ -46,6 +46,8 @@
 	IBOutlet NSTextField*			_statusLine;
 	IBOutlet NSScrollView*			_contentView;
 	IBOutlet ResultsView*			_resultsView;
+	IBOutlet NSMenuItem*			_plotVxy;
+	IBOutlet NSMenuItem*			_plotExy;
 	SimWorkspace*					_workspace;
 	NSURL*							_srcFileName;
 }
@@ -150,6 +152,38 @@
 - (ResultsView*) getResultsView;
 
 /*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see V(x,y) plotted from the
+ simulation. This method will almost certainly never get called as the
+ connection is established in InterfaceBuilder, but for the sake of
+ completness, here it is.
+ */
+- (void) setPlotVxy:(NSMenuItem*)item;
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see V(x,y) plotted from the
+ simulation.
+ */
+- (NSMenuItem*) getPlotVxy;
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see E(x,y) plotted from the
+ simulation. This method will almost certainly never get called as the
+ connection is established in InterfaceBuilder, but for the sake of
+ completness, here it is.
+ */
+- (void) setPlotExy:(NSMenuItem*)item;
+
+/*!
+ This method sets the NSMenuItem that will be used in the application
+ to let the user select that they want to see E(x,y) plotted from the
+ simulation.
+ */
+- (NSMenuItem*) getPlotExy;
+
+/*!
  This method sets the workspace that will be used for subsequent sims
  of the objects in the associated factory's inventory. The two pieces
  need to work together through this controller to get the job done.
@@ -217,6 +251,20 @@
  to it.
  */
 - (IBAction) runSim:(id)sender;
+
+/*!
+ This method will set the state of the NSMenuItems saying that the output
+ of the simulation should be plotting V(x,y) - and if the current plot is
+ E(x,y), then re-plot the simulation as V(x,y).
+ */
+- (IBAction) plotVxy:(id)sender;
+
+/*!
+ This method will set the state of the NSMenuItems saying that the output
+ of the simulation should be plotting E(x,y) - and if the current plot is
+ V(x,y), then re-plot the simulation as E(x,y).
+ */
+- (IBAction) plotExy:(id)sender;
 
 //----------------------------------------------------------------------------
 //					General Housekeeping

@@ -192,6 +192,16 @@
                                     <action selector="runSim:" target="318" id="350"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Plot V(x,y)" state="on" keyEquivalent="V" indentationLevel="2" id="k6O-aU-FqC">
+                                <connections>
+                                    <action selector="plotVxy:" target="318" id="W6I-Y8-7ph"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Plot E(x,y)" keyEquivalent="E" indentationLevel="2" id="GDC-6k-DvG">
+                                <connections>
+                                    <action selector="plotExy:" target="318" id="n6i-cZ-0me"/>
+                                </connections>
+                            </menuItem>
                             <menuItem isSeparatorItem="YES" id="284">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
@@ -345,6 +355,8 @@
             <connections>
                 <outlet property="_contentView" destination="249" id="vdP-Y3-AQ8"/>
                 <outlet property="_factory" destination="319" id="321"/>
+                <outlet property="_plotExy" destination="GDC-6k-DvG" id="CY1-f3-a5E"/>
+                <outlet property="_plotVxy" destination="k6O-aU-FqC" id="o2v-qk-7n3"/>
                 <outlet property="_progressBar" destination="255" id="aPq-Jf-BDs"/>
                 <outlet property="_resultsView" destination="pgx-hh-Ecg" id="DNX-Ma-5Wy"/>
                 <outlet property="_statusLine" destination="253" id="iT0-3X-bP8"/>
