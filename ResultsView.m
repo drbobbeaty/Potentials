@@ -406,21 +406,24 @@
 - (void) drawRect:(NSRect)dirtyRect {
 	// always do the super's call first, to make sure it's done right
     [super drawRect:dirtyRect];
-    
+
+	// start the timer on the drawing work...
+	NSTimeInterval begin = [NSDate timeIntervalSinceReferenceDate];
+
 	// start with a white background for the drawing area...
 	[[NSColor whiteColor] setFill];
 	NSRectFill(dirtyRect);
 
 	// plot all the data on a uniform grid
 	CGContextRef	myContext = nil;
-	NSColor*		spectrum[] = {[NSColor redColor],
+	NSColor*		spectrum[] = {[NSColor blueColor],
+								  [NSColor redColor],
 								  [NSColor orangeColor],
 								  [NSColor yellowColor],
 								  [NSColor cyanColor]};
-	int 			stages = 4;
+	int 			stages = 5;
 	double			dc = 1.0/(stages - 1);
 	if (_values != nil) {
-		NSLog(@"[ResultsView -drawRect:] - starting to draw the data...");
 		myContext = [[NSGraphicsContext currentContext] CGContext];
 		CGFloat		dx = [self frame].size.width / _colCnt;
 		CGFloat		dy = [self frame].size.height / _rowCnt;
@@ -443,6 +446,7 @@
 			}
 		}
 //		CGContextAddLines(myContext, points, count);
+		NSLog(@"[ResultsView -drawRect:] - plot drawn in %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 	}
 }
 
