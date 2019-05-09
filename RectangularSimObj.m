@@ -360,99 +360,22 @@
 	 * If this guy is solid, then we need to do a little more work to
 	 * get the actual size of the rectangle to "paint" on the workspace.
 	 */
-	if (!error && !allDone && [self isSolid]) {
-		int			r = 0;
-		int			c = 0;
-
+	if (!error && !allDone) {
 		// correct the x-axis first
-		if ((xlo == -1) && (xhi >= 0)) {
-			xlo = 0;
-		} else if ((xlo >= 0) && (xhi == -1)) {
-			xhi = [ws getColCount] - 1;
-		}
+		xlo = (xlo < 0 ? 0 : xlo);
+		xhi = (xhi < 0 ? ([ws getColCount] - 1) : xhi);
 		// now correct the y-axis
-		if ((ylo == -1) && (yhi >= 0)) {
-			ylo = 0;
-		} else if ((ylo >= 0) && (yhi == -1)) {
-			yhi = [ws getRowCount] - 1;
-		}
+		ylo = (ylo < 0 ? 0 : ylo);
+		yhi = (yhi < 0 ? ([ws getRowCount] - 1) : yhi);
 
 		// now we can "paint" each node in the workspace grid
-		for (r = ylo; !error && (r <= yhi); r++) {
-			for (c = xlo; !error && (c <= xhi); c++) {
-				if (![self addObjPropsToWorkspace:ws atNodeRow:r andCol:c]) {
-					error = YES;
-					NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this solid object, yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", r, c);
-				}
-			}
-		}
-
-		// now flag this as done
-		allDone = YES;
-	}
-
-	/*
-	 * If we are here, then it means that it's a hollow object and we need
-	 * to treat it a little differently so that we don't have extra lines
-	 * in the simulation that might mess things up.
-	 */
-	if (!error && !allDone) {
-		int			i = 0;
-		int			istart = 0;
-		int			istop = 0;
-		
-		/*
-		 * See if the left or right sides exists in the workspace
-		 */
-		if ((xlo >= 0) || (xhi >= 0)) {
-			// assume a reasonable endpoints for the line
-			istart = ylo;
-			istop = yhi;
-			// now correct the y-axis limits for the workspace
-			if ((ylo == -1) && (yhi >= 0)) {
-				istart = 0;
-			} else if ((ylo >= 0) && (yhi == -1)) {
-				istop = [ws getRowCount] - 1;
-			}
-			// now "paint" the line in the workspace
-			for (i = istart; !error && (i <= istop); i++) {
-				// see if the left side is "in play" on the workspace
-				if ((xlo >= 0) && ![self addObjPropsToWorkspace:ws atNodeRow:i andCol:xlo]) {
-					error = YES;
-					NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this hollow object (left side), yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", i, xlo);
-				}
-				// see if the right side is "in play" on the workspace
-				if ((xhi >= 0) && ![self addObjPropsToWorkspace:ws atNodeRow:i andCol:xhi]) {
-					error = YES;
-					NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this hollow object (right side), yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", i, xhi);
-				}
-			}
-		}
-
-		/*
-		 * See if the top or bottom sides exists in the workspace
-		 */
-		if ((ylo >= 0) || (yhi >= 0)) {
-			// assume a reasonable endpoints for the line
-			istart = xlo;
-			istop = xhi;
-			// now correct the x-axis limits for the workspace
-			if ((xlo == -1) && (xhi >= 0)) {
-				istart = 0;
-			} else if ((xlo >= 0) && (xhi == -1)) {
-				istop = [ws getColCount] - 1;
-			}
-			// now "paint" the line in the workspace
-			for (i = istart; !error && (i <= istop); i++) {
-				// see if the top side is "in play" on the workspace
-				if ((ylo >= 0) && ![self addObjPropsToWorkspace:ws atNodeRow:ylo andCol:i]) {
-					error = YES;
-					NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this hollow object (top side), yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", ylo, i);
-				}
-				// see if the bottom side is "in play" on the workspace
-				if ((yhi >= 0) && ![self addObjPropsToWorkspace:ws atNodeRow:yhi andCol:i]) {
-					error = YES;
-					NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this hollow object (bottom side), yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", yhi, i);
+		for (int r = ylo; !error && (r <= yhi); r++) {
+			for (int c = xlo; !error && (c <= xhi); c++) {
+				if ((r == ylo) || (r == yhi-1) || (c == xlo) || (c == xhi-1) || [self isSolid]) {
+					if (![self addObjPropsToWorkspace:ws atNodeRow:r andCol:c]) {
+						error = YES;
+						NSLog(@"[RectangularSimObj -addToWorkspace:] - the point at (row,col): (%d,%d) was supposed to be part of this object, yet when I tried to set it's values on the workspace an error occurred. Please check the logs for a possible cause.", r, c);
+					}
 				}
 			}
 		}
@@ -462,6 +385,37 @@
 	}
 
 	return !error;
+}
+
+
+/*!
+ This method returns an NSDictionary with the Quartz 2D drawing data
+ and keys to indicate *how* to draw that object. The axis measurements
+ are normalized to [0..1] so that scaling this is very easy, and it's
+ placed in the workspace so that as that region is drawn, this object
+ is in the correct location. This is essential so that this guy can
+ be drawn on the simulation results.
+ */
+- (NSDictionary*) drawingInfo:(SimWorkspace*)ws
+{
+	if (ws != nil) {
+		NSRect		wsr = [ws getWorkspaceRect];
+		NSRect		rect;
+		rect.size = [self getSize];
+		// move the center of the rect to the origin for the NSRect
+		rect.origin = [self getLocation];
+		rect.origin.x -= rect.size.width/2.0;
+		rect.origin.y -= rect.size.height/2.0;
+		// map the point to [0..1] on each axis for plotting
+		rect.origin.x = (rect.origin.x - wsr.origin.x)/wsr.size.width;
+		rect.origin.y = (rect.origin.y - wsr.origin.y)/wsr.size.height;
+		rect.size.width /= wsr.size.width;
+		rect.size.height /= wsr.size.height;
+		return @{@"draw" : @"rect",
+				 @"data" : [NSValue valueWithRect:rect]};
+	}
+	// there's nothing we can possibly do without a workspace
+	return nil;
 }
 
 @end

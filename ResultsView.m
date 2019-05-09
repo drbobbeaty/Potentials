@@ -15,7 +15,7 @@
 // Other Headers
 
 // Class Headers
-#import "ResultsView.h"
+#import "ResultsView_Protected.h"
 
 // Superclass Headers
 
@@ -37,29 +37,33 @@
 @implementation ResultsView
 
 //----------------------------------------------------------------------------
-//					Plotting Methods
+//               Accessor Methods
 //----------------------------------------------------------------------------
 
 /*!
- This method colors the view in a distinctive awy so I can see it on the
- screen and make sure it's OK.
+ This method gets the currently defined inventory of drawable objects from
+ the SimWorkspace that can be overlaid on the simulation's plotted results.
  */
-- (void) drawTestPattern
+- (NSArray*) getInventory
 {
-	NSLog(@"[ResultsView -drawTestPattern:] - ready to draw the test pattern in the view.");
+	return _inventory;
 }
 
+
+//----------------------------------------------------------------------------
+//					Plotting Methods
+//----------------------------------------------------------------------------
 
 /*!
  This method takes the provided SimWorkspace and plots the Voltage as a
  function of x and y, based on the row, col organization of the Voltage
  data within the SimWorkspace.
  */
-- (void) plotVoltage:(SimWorkspace*) workspace
+- (void) plotVoltage:(SimWorkspace*)workspace with:(NSArray*)inventory
 {
 	BOOL				error = NO;
 
-	// first, make sure that there's a workspace to plot
+	// first, make sure that there's something to work with
 	if (!error) {
 		if (workspace == nil) {
 			error = YES;
@@ -99,6 +103,12 @@
 				_values[r][c] = (v - Vmin)/(Vmax - Vmin);
 			}
 		}
+		// ...and save the limits we discovered for the graphing
+		_graphedMax = Vmax;
+		_graphedMin = Vmin;
+		// ...and save the shape and inventory from the workspace
+		_workspaceRect = [workspace getWorkspaceRect];
+		[self _setInventory:inventory];
 	}
 
 	[self setNeedsDisplay:YES];
@@ -111,11 +121,11 @@
  as a function of x and y, based on the row, col organization of the Voltage
  data within the SimWorkspace.
  */
-- (void) plotElectricField:(SimWorkspace*) workspace
+- (void) plotElectricField:(SimWorkspace*)workspace with:(NSArray*)inventory
 {
 	BOOL				error = NO;
 
-	// first, make sure that there's a workspace to plot
+	// first, make sure that there's something to work with
 	if (!error) {
 		if (workspace == nil) {
 			error = YES;
@@ -155,6 +165,12 @@
 				_values[r][c] = (em - Emin)/(Emax - Emin);
 			}
 		}
+		// ...and save the limits we discovered for the graphing
+		_graphedMax = Emax;
+		_graphedMin = Emin;
+		// ...and save the shape and inventory from the workspace
+		_workspaceRect = [workspace getWorkspaceRect];
+		[self _setInventory:inventory];
 	}
 
 	[self setNeedsDisplay:YES];
@@ -390,9 +406,10 @@
 		_values = nil;
 	}
 
-	// make sure to clear out the size of the array now
+	// make sure to clear out the size of the array, and the drawable inventory
 	_rowCnt = 0;
 	_colCnt = 0;
+	[self _setInventory:nil];
 }
 
 
@@ -414,7 +431,7 @@
 	[[NSColor whiteColor] setFill];
 	NSRectFill(dirtyRect);
 
-	// plot all the data on a uniform grid
+	// plot all the simulation data on the viewport
 	CGContextRef	myContext = nil;
 	NSColor*		spectrum[] = {[NSColor blueColor],
 								  [NSColor redColor],
@@ -427,7 +444,6 @@
 		myContext = [[NSGraphicsContext currentContext] CGContext];
 		CGFloat		dx = [self frame].size.width / _colCnt;
 		CGFloat		dy = [self frame].size.height / _rowCnt;
-		CGFloat		gs = MIN(dx, dy);
 		NSColor*	gc = nil;
 		CGFloat		red, grn, blu, alph;
 		double		x = 0.0;
@@ -441,13 +457,84 @@
 				if (gc) {
 					[gc getRed:(&red) green:(&grn) blue:(&blu) alpha:(&alph)];
 					CGContextSetRGBFillColor(myContext, red, grn, blu, alph);
-					CGContextFillRect(myContext, CGRectMake(c*gs, r*gs, gs, gs));
+					CGContextFillRect(myContext, CGRectMake(c*dx, r*dy, dx, dy));
 				}
 			}
 		}
-//		CGContextAddLines(myContext, points, count);
-		NSLog(@"[ResultsView -drawRect:] - plot drawn in %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 	}
+
+	// now draw all the objects in the workspace on top of this...
+	if ([self getInventory] != nil) {
+		CGFloat		sx = [self frame].size.width;
+		CGFloat		sy = [self frame].size.height;
+		NSLog(@"[ResultsView -drawRect:] - drawing size: %.2fx%.2f", sx, sy);
+		for (NSDictionary* info in [self getInventory]) {
+			// everything draws to the view, scaled on the
+			NSString*	draw = info[@"draw"];
+			if ([draw isEqualToString:@"line"]) {
+				// get the specifics for the line from the data
+				NSPoint		beg = [info[@"from"] pointValue];
+				NSPoint		end = [info[@"to"] pointValue];
+				// map it to the viewport for drawing
+				beg.x *= sx;
+				beg.y *= sy;
+				end.x *= sx;
+				end.y *= sy;
+				CGPoint		line[] = {beg, end};
+				NSLog(@"[ResultsView -drawRect:] - drawing line inventory: (%.2f, %.2f) -> (%.2f, %.2f)", beg.x, beg.y, end.x, end.y);
+				// draw the line in the viewport
+				CGContextBeginPath(myContext);
+				CGContextSetLineWidth(myContext, 1.0);
+				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+				CGContextAddLines(myContext, line, 2);
+				CGContextStrokePath(myContext);
+			} else if ([draw isEqualToString:@"rect"]) {
+				// get the specifics for the rectasngle from the data
+				NSRect		rect = [info[@"data"] rectValue];
+				// map it to the viewport for drawing
+				rect.origin.x *= sx;
+				rect.origin.y *= sy;
+				rect.size.width *= sx;
+				rect.size.height *= sy;
+				NSLog(@"[ResultsView -drawRect:] - drawing rect inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+				// draw the rectangle in the viewport
+				CGContextBeginPath(myContext);
+				CGContextSetLineWidth(myContext, 1.0);
+				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+				CGContextAddRect(myContext, rect);
+				CGContextStrokePath(myContext);
+			} else if ([draw isEqualToString:@"point"]) {
+				// get the specifics for the point from the data
+				NSPoint		pt = [info[@"data"] pointValue];
+				// map it to the viewport for drawing
+				pt.x *= sx;
+				pt.y *= sy;
+				NSLog(@"[ResultsView -drawRect:] - drawing point inventory: (%.2f, %.2f)", pt.x, pt.y);
+				// draw the point in the viewport
+				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+				CGContextFillRect(myContext, CGRectMake(pt.x, pt.y, 3, 3));
+			} else if ([draw isEqualToString:@"circle"]) {
+				// get the specifics for the circle from the data
+				NSRect		rect = [info[@"data"] rectValue];
+				// map it to the viewport for drawing
+				rect.origin.x *= sx;
+				rect.origin.y *= sy;
+				rect.size.width *= sx;
+				rect.size.height *= sy;
+				NSLog(@"[ResultsView -drawRect:] - drawing circle inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+				// draw the circle in the viewport
+				CGContextBeginPath(myContext);
+				CGContextSetLineWidth(myContext, 1.0);
+				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
+				CGContextAddEllipseInRect(myContext, rect);
+				CGContextStrokePath(myContext);
+			} else {
+				NSLog(@"[ResultsView -drawRect:] - unable to draw the figure: %@", info);
+			}
+		}
+	}
+
+	NSLog(@"[ResultsView -drawRect:] - plot drawn in %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 }
 
 

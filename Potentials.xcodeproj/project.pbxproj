@@ -36,6 +36,8 @@
 		323D06182279D88A00D745C0 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 323D06162279D88A00D745C0 /* MainMenu.xib */; };
 		323D061B2279EB8400D745C0 /* ResultsView.h in Headers */ = {isa = PBXBuildFile; fileRef = 323D06192279EB8400D745C0 /* ResultsView.h */; };
 		323D061C2279EB8400D745C0 /* ResultsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 323D061A2279EB8400D745C0 /* ResultsView.m */; };
+		323D061F22832ADF00D745C0 /* ResultsView_Protected.h in Headers */ = {isa = PBXBuildFile; fileRef = 323D061D22832ADF00D745C0 /* ResultsView_Protected.h */; };
+		323D062022832ADF00D745C0 /* ResultsView_Protected.m in Sources */ = {isa = PBXBuildFile; fileRef = 323D061E22832ADF00D745C0 /* ResultsView_Protected.m */; };
 		327DC2352264C5600010C706 /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 327DC2342264C5600010C706 /* Accelerate.framework */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +70,8 @@
 		323D06172279D88A00D745C0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		323D06192279EB8400D745C0 /* ResultsView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResultsView.h; sourceTree = "<group>"; };
 		323D061A2279EB8400D745C0 /* ResultsView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResultsView.m; sourceTree = "<group>"; };
+		323D061D22832ADF00D745C0 /* ResultsView_Protected.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResultsView_Protected.h; sourceTree = "<group>"; };
+		323D061E22832ADF00D745C0 /* ResultsView_Protected.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ResultsView_Protected.m; sourceTree = "<group>"; };
 		32740239045D947E00B4F370 /* MaskedMatrix.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaskedMatrix.h; sourceTree = "<group>"; };
 		3274023A045D947E00B4F370 /* MaskedMatrix.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MaskedMatrix.m; sourceTree = "<group>"; };
 		327DC2332264BEC60010C706 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -115,6 +119,8 @@
 				3274023A045D947E00B4F370 /* MaskedMatrix.m */,
 				323D06192279EB8400D745C0 /* ResultsView.h */,
 				323D061A2279EB8400D745C0 /* ResultsView.m */,
+				323D061D22832ADF00D745C0 /* ResultsView_Protected.h */,
+				323D061E22832ADF00D745C0 /* ResultsView_Protected.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -198,6 +204,7 @@
 				3216BCE30C354713007FC0F8 /* Potentials_Prefix.h in Headers */,
 				3216BCE40C354713007FC0F8 /* BaseSimObj.h in Headers */,
 				3216BCE50C354713007FC0F8 /* CircularSimObj.h in Headers */,
+				323D061F22832ADF00D745C0 /* ResultsView_Protected.h in Headers */,
 				3216BCE60C354713007FC0F8 /* PointSimObj.h in Headers */,
 				3216BCE70C354713007FC0F8 /* LineSimObj.h in Headers */,
 				3216BCE80C354713007FC0F8 /* SimObjFactory.h in Headers */,
@@ -288,6 +295,7 @@
 				3216BCF40C354713007FC0F8 /* RectangularSimObj.m in Sources */,
 				3216BCF50C354713007FC0F8 /* CircularSimObj.m in Sources */,
 				3216BCF60C354713007FC0F8 /* PointSimObj.m in Sources */,
+				323D062022832ADF00D745C0 /* ResultsView_Protected.m in Sources */,
 				3216BCF70C354713007FC0F8 /* LineSimObj.m in Sources */,
 				3216BCF80C354713007FC0F8 /* SimObjFactory.m in Sources */,
 				3216BCF90C354713007FC0F8 /* SimWorkspace.m in Sources */,

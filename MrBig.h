@@ -342,6 +342,14 @@
  */
 - (void) writeOutResults:(NSURL*)filename;
 
+/*!
+ This method looks at each of the BaseSimObj instances in the SimObjFactory's
+ Inventory, and asks them to map themselves to the SimWorkspace on a linear
+ coordinate system [0..1]. This will then make it easy to draw them in the
+ ResultsView as that viewport is resized.
+ */
+- (NSArray*) createDrawableSimObjs;
+
 //----------------------------------------------------------------------------
 //					NSObject Overridden Methods
 //----------------------------------------------------------------------------

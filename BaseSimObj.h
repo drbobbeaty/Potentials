@@ -44,11 +44,11 @@
 @interface BaseSimObj : NSObject {
 	@private
 	NSPoint			_center;
-	BOOL				_isAConductor;
+	BOOL			_isAConductor;
 	double			_voltage;
 	double			_relativeEpsilon;
 	double			_fixedCharge;
-	BOOL				_isSolid;
+	BOOL			_isSolid;
 }
 
 //----------------------------------------------------------------------------
@@ -321,5 +321,15 @@
  same functionality and every one of them needs it.
  */
 - (BOOL) addObjPropsToWorkspace:(SimWorkspace*)ws atNodeRow:(int)r andCol:(int)c;
+
+/*!
+ This method returns an NSDictionary with the Quartz 2D drawing data
+ and keys to indicate *how* to draw that object. The axis measurements
+ are normalized to [0..1] so that scaling this is very easy, and it's
+ placed in the workspace so that as that region is drawn, this object
+ is in the correct location. This is essential so that this guy can
+ be drawn on the simulation results.
+ */
+- (NSDictionary*) drawingInfo:(SimWorkspace*)ws;
 
 @end

@@ -39,34 +39,42 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface ResultsView : NSView {
 	@private
-	int 		_rowCnt;
-	int			_colCnt;
-	double**	_values;
+	double			_graphedMax;
+	double			_graphedMin;
+	NSRect			_workspaceRect;
+	int 			_rowCnt;
+	int				_colCnt;
+	double**		_values;
+	NSArray*		_inventory;
 }
+
+//----------------------------------------------------------------------------
+//               Accessor Methods
+//----------------------------------------------------------------------------
+
+/*!
+ This method gets the currently defined inventory of drawable objects from
+ the SimWorkspace that can be overlaid on the simulation's plotted results.
+ */
+- (NSArray*) getInventory;
 
 //----------------------------------------------------------------------------
 //					Plotting Methods
 //----------------------------------------------------------------------------
 
 /*!
- This method colors the view in a distinctive way so I can see it on the
- screen and make sure it's OK.
- */
-- (void) drawTestPattern;
-
-/*!
  This method takes the provided SimWorkspace and plots the Voltage as a
  function of x and y, based on the row, col organization of the Voltage
  data within the SimWorkspace.
  */
-- (void) plotVoltage:(SimWorkspace*) workspace;
+- (void) plotVoltage:(SimWorkspace*)workspace with:(NSArray*)inventory;
 
 /*!
  This method takes the provided SimWorkspace and plots the Electric Field
  as a function of x and y, based on the row, col organization of the Voltage
  data within the SimWorkspace.
  */
-- (void) plotElectricField:(SimWorkspace*) workspace;
+- (void) plotElectricField:(SimWorkspace*)workspace with:(NSArray*)inventory;
 
 //----------------------------------------------------------------------------
 //               Linear Interpolation of Color Methods

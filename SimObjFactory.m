@@ -212,16 +212,16 @@
  */
 - (BaseSimObj*) createSimObjWithString:(NSString*)line
 {
-	BOOL					error = NO;
+	BOOL			error = NO;
 	BaseSimObj*		retval = nil;
-	float					x = 0.0;
-	float					y = 0.0;
-	float					radius = 0.0;
-	float					width = 0.0;
-	float					height = 0.0;
-	float					endX = 0.0;
-	float					endY = 0.0;
-	double				value = 0.0;
+	float			x = 0.0;
+	float			y = 0.0;
+	float			radius = 0.0;
+	float			width = 0.0;
+	float			height = 0.0;
+	float			endX = 0.0;
+	float			endY = 0.0;
+	double			value = 0.0;
 
 	// first, make sure we have something to do here
 	if (!error) {

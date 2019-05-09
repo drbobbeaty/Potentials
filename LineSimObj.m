@@ -498,4 +498,32 @@
 	return retval;
 }
 
+
+/*!
+ This method returns an NSDictionary with the Quartz 2D drawing data
+ and keys to indicate *how* to draw that object. The axis measurements
+ are normalized to [0..1] so that scaling this is very easy, and it's
+ placed in the workspace so that as that region is drawn, this object
+ is in the correct location. This is essential so that this guy can
+ be drawn on the simulation results.
+ */
+- (NSDictionary*) drawingInfo:(SimWorkspace*)ws
+{
+	if (ws != nil) {
+		NSRect		wsr = [ws getWorkspaceRect];
+		NSPoint		beg = [self getStartPoint];
+		NSPoint		end = [self getEndPoint];
+		// map the point to [0..1] on each axis for plotting
+		beg.x = (beg.x - wsr.origin.x)/wsr.size.width;
+		beg.y = (beg.y - wsr.origin.y)/wsr.size.height;
+		end.x = (end.x - wsr.origin.x)/wsr.size.width;
+		end.y = (end.y - wsr.origin.y)/wsr.size.height;
+		return @{@"draw" : @"line",
+				 @"from" : [NSValue valueWithPoint:beg],
+				 @"to" : [NSValue valueWithPoint:end]};
+	}
+	// there's nothing we can possibly do without a workspace
+	return nil;
+}
+
 @end

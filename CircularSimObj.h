@@ -137,4 +137,14 @@
  */
 - (BOOL) addToWorkspace:(SimWorkspace*)ws;
 
+/*!
+ This method returns an NSDictionary with the Quartz 2D drawing data
+ and keys to indicate *how* to draw that object. The axis measurements
+ are normalized to [0..1] so that scaling this is very easy, and it's
+ placed in the workspace so that as that region is drawn, this object
+ is in the correct location. This is essential so that this guy can
+ be drawn on the simulation results.
+ */
+- (NSDictionary*) drawingInfo:(SimWorkspace*)ws;
+
 @end

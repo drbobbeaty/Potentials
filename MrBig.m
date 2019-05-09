@@ -536,32 +536,20 @@
 		}
 	}
 
-	// change the status line to something useful
-	if (!error) {
-		[self showStatus:@"Adding objects to workspace"];
-	}
-
 	// now add all the factory's objects to the workspace
 	if (!error) {
-		BaseSimObj*		obj = nil;
-		NSEnumerator*	enumerator = [[[self getFactory] getInventory] objectEnumerator];
-		if (enumerator != nil) {
-			while (obj = [enumerator nextObject]) {
-				// everything goes to the Workspace
-				if (![obj addToWorkspace:ws]) {
-					NSLog(@"[MrBig -runSim:] - the simulation object could not be added to the workspace. This is a serious problem and look to the logs for a possible cause.");
-				}
+		[self showStatus:@"Adding objects to workspace"];
+		for (BaseSimObj* obj in [[self getFactory] getInventory]) {
+			// everything goes to the Workspace
+			if (![obj addToWorkspace:ws]) {
+				NSLog(@"[MrBig -runSim:] - the simulation object could not be added to the workspace. This is a serious problem and look to the logs for a possible cause.");
 			}
 		}
 	}
 
-	// change the status line to something useful
-	if (!error) {
-		[self showStatus:@"Simulating workspace"];
-	}
-
 	// now run the simulation on the workspace
 	if (!error) {
+		[self showStatus:@"Simulating workspace"];
 		if (![ws simulateWorkspace]) {
 			error = YES;
 			NSLog(@"[MrBig -runSim:] - the workspace could not properly be simulated. Please check the logs for a possible cause.");
@@ -570,11 +558,13 @@
 
 	// to make things simple, output the results of the simulation
 	if (!error) {
+		// based on the user's selection, plot the V(x,y) or E(x,y)
 		if ([[self getPlotVxy] state] == 1) {
-			[[self getResultsView] plotVoltage:ws];
+			[[self getResultsView] plotVoltage:ws with:[self createDrawableSimObjs]];
 		} else {
-			[[self getResultsView] plotElectricField:ws];
+			[[self getResultsView] plotElectricField:ws with:[self createDrawableSimObjs]];
 		}
+		// finally, we can write this data out to the files
 		[self writeOutResults:[[[self getSrcFileName] URLByDeletingPathExtension] URLByAppendingPathExtension:@"ans"]];
 	}
 
@@ -611,7 +601,7 @@
 			[[self getPlotExy] setState:0];
 			// plot the Voltage on the workspace
 			if ([ws getResultantVoltage] != nil) {
-				[[self getResultsView] plotVoltage:ws];
+				[[self getResultsView] plotVoltage:ws with:[self createDrawableSimObjs]];
 			}
 		}
 	}
@@ -644,7 +634,7 @@
 			[[self getPlotExy] setState:1];
 			// plot the Electric Field on the workspace
 			if ([ws getResultantVoltage] != nil) {
-				[[self getResultsView] plotElectricField:ws];
+				[[self getResultsView] plotElectricField:ws with:[self createDrawableSimObjs]];
 			}
 		}
 	}
@@ -667,9 +657,6 @@
 	[[self getContentText] setFont:[NSFont fontWithName:@"Consolas" size:10.0]];
 	// clear out the content area as we wish it to appear clean
 	[[self getContentText] setString:@""];
-
-	// make the view a red color to see where it really is
-	[[self getResultsView] drawTestPattern];
 
 	// Set the status to a simple 'Ready'
 	[self showStatus:@"Ready"];
@@ -759,36 +746,32 @@
 	 * anything else, pass it to the Factory for it to process.
 	 */
 	if (!error) {
-		NSString*		line = nil;
-		NSEnumerator*	enumerator = [lines objectEnumerator];
-		if (enumerator != nil) {
-			while (line = [enumerator nextObject]) {
-				// see if it starts with a '#' - a comment
-				if ([line hasPrefix:@"#"] || ([line length] == 0)) {
-					// go back and get another line
-					continue;
-				}
-				
-				// see if it starts with 'WS' - a workspace command
-				if ([line hasPrefix:@"WS"]) {
-					SimWorkspace*		ws = [self createWorkspace:line];
-					if (ws == nil) {
-						error = YES;
-						NSLog(@"[MrBig -loadEngine:] - the line in the source was supposed to construct a workspace, but it failed. Please check the logs for the possible cause: '%@'", line);
-					} else {
-						// save this guy for our use later
-						[self setWorkspace:ws];
-					}
-					
-					// go back and get another line
-					continue;
-				}
-				
-				// everything else goes to the Factory
-				if ([[self getFactory] createSimObjWithString:line] == nil) {
+		for (NSString* line in lines) {
+			// see if it starts with a '#' - a comment
+			if ([line hasPrefix:@"#"] || ([line length] == 0)) {
+				// go back and get another line
+				continue;
+			}
+
+			// see if it starts with 'WS' - a workspace command
+			if ([line hasPrefix:@"WS"]) {
+				SimWorkspace*		ws = [self createWorkspace:line];
+				if (ws == nil) {
 					error = YES;
-					NSLog(@"[MrBig -loadEngine:] - the line in the source could not be parsed into simulation object. Please make sure that the format is correct: '%@'", line);
+					NSLog(@"[MrBig -loadEngine:] - the line in the source was supposed to construct a workspace, but it failed. Please check the logs for the possible cause: '%@'", line);
+				} else {
+					// save this guy for our use later
+					[self setWorkspace:ws];
 				}
+
+				// go back and get another line
+				continue;
+			}
+
+			// everything else goes to the Factory
+			if ([[self getFactory] createSimObjWithString:line] == nil) {
+				error = YES;
+				NSLog(@"[MrBig -loadEngine:] - the line in the source could not be parsed into simulation object. Please make sure that the format is correct: '%@'", line);
 			}
 		}
 	}
@@ -994,6 +977,50 @@
 			fclose(mage);
 		}
 	}
+}
+
+
+/*!
+ This method looks at each of the BaseSimObj instances in the SimObjFactory's
+ Inventory, and asks them to map themselves to the SimWorkspace on a linear
+ coordinate system [0..1]. This will then make it easy to draw them in the
+ ResultsView as that viewport is resized.
+ */
+- (NSArray*) createDrawableSimObjs
+{
+	BOOL				error = NO;
+
+	SimWorkspace*		ws = nil;
+	// first, make sure we have a workspace to use
+	if (!error) {
+		ws = [self getWorkspace];
+		if (ws == nil) {
+			error = YES;
+			NSLog(@"[MrBig -createDrawableSimObjs] - there is no defined workspace with which to base the BaseSimObj. Please make sure there is before calling this method.");
+		}
+	}
+
+	NSMutableArray*		inventory = nil;
+	// at this point, create the returned array, and fill it
+	if (!error) {
+		inventory = [[[NSMutableArray alloc] init] autorelease];
+		if (inventory == nil) {
+			error = true;
+			NSLog(@"[MrBig -createDrawableSimObjs] - the storage for all the drawable simulation objects could not be created. This is a serious allocation error and needs to be looked into as soon as possible.");
+		} else {
+			NSDictionary*	info = nil;
+			for (BaseSimObj* obj in [[self getFactory] getInventory]) {
+				// everything draws to the view, based on the workspace
+				info = [obj drawingInfo:ws];
+				if (info != nil) {
+					NSLog(@"[MrBig -createDrawableSimObjs] - adding %@ to the inventory", info);
+					[inventory addObject:info];
+				}
+			}
+		}
+	}
+
+	return (error ? nil : inventory);
 }
 
 
