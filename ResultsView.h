@@ -53,6 +53,39 @@ NS_ASSUME_NONNULL_BEGIN
 //----------------------------------------------------------------------------
 
 /*!
+ This method gets the actual minimum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (double) getGraphedMin;
+
+/*!
+ This method gets the actual maximum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (double) getGraphedMax;
+
+/*!
+ This method returns the shape of the simulated workspace that is being
+ plotted on this view. This is the un-scaled shape, and is used in the
+ mapping from that workspace to the view.
+ */
+- (NSRect) getGraphedRect;
+
+/*!
+ This method returns the number of rows in the simulated data that need to
+ be properly graphed in this view.
+ */
+- (int) getRowCount;
+
+/*!
+ This method returns the number of columns in the simulated data that need to
+ be properly graphed in this view.
+ */
+- (int) getColCount;
+
+/*!
  This method gets the currently defined inventory of drawable objects from
  the SimWorkspace that can be overlaid on the simulation's plotted results.
  */

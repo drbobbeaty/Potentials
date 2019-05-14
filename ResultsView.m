@@ -7,6 +7,7 @@
 //
 
 // Apple Headers
+#import <Accelerate/Accelerate.h>
 
 // System Headers
 
@@ -39,6 +40,58 @@
 //----------------------------------------------------------------------------
 //               Accessor Methods
 //----------------------------------------------------------------------------
+
+/*!
+ This method gets the actual minimum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (double) getGraphedMin
+{
+	return _graphedMin;
+}
+
+
+/*!
+ This method gets the actual maximum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (double) getGraphedMax
+{
+	return _graphedMax;
+}
+
+
+/*!
+ This method returns the shape of the simulated workspace that is being
+ plotted on this view. This is the un-scaled shape, and is used in the
+ mapping from that workspace to the view.
+ */
+- (NSRect) getGraphedRect
+{
+	return _workspaceRect;
+}
+
+
+/*!
+ This method returns the number of rows in the simulated data that need to
+ be properly graphed in this view.
+ */
+- (int) getRowCount
+{
+	return _rowCnt;
+}
+
+/*!
+ This method returns the number of columns in the simulated data that need to
+ be properly graphed in this view.
+ */
+- (int) getColCount
+{
+	return _colCnt;
+}
+
 
 /*!
  This method gets the currently defined inventory of drawable objects from
@@ -95,8 +148,8 @@
 	if (!error) {
 		double	v = 0.0;
 		// now let's loop over all the points and write out what we want...
-		for (int r = 0; r < _rowCnt; r++) {
-			for (int c = 0; c < _colCnt; c++) {
+		for (int r = 0; r < [self getRowCount]; r++) {
+			for (int c = 0; c < [self getColCount]; c++) {
 				// now get the results at this node
 				v = [workspace getResultantVoltageAtNodeRow:r andCol:c];
 				// save all this for drawing
@@ -104,10 +157,10 @@
 			}
 		}
 		// ...and save the limits we discovered for the graphing
-		_graphedMax = Vmax;
-		_graphedMin = Vmin;
+		[self _setGraphedMax:Vmax];
+		[self _setGraphedMin:Vmin];
 		// ...and save the shape and inventory from the workspace
-		_workspaceRect = [workspace getWorkspaceRect];
+		[self _setGraphedRect:[workspace getWorkspaceRect]];
 		[self _setInventory:inventory];
 	}
 
@@ -157,8 +210,8 @@
 	if (!error) {
 		double	em = 0.0;
 		// now let's loop over all the points and write out what we want...
-		for (int r = 0; r < _rowCnt; r++) {
-			for (int c = 0; c < _colCnt; c++) {
+		for (int r = 0; r < [self getRowCount]; r++) {
+			for (int c = 0; c < [self getColCount]; c++) {
 				// now get the results at this node
 				em = [workspace getResultantElectricFieldMagnitudeAtNodeRow:r andCol:c];
 				// save all this for drawing
@@ -166,10 +219,10 @@
 			}
 		}
 		// ...and save the limits we discovered for the graphing
-		_graphedMax = Emax;
-		_graphedMin = Emin;
+		[self _setGraphedMax:Emax];
+		[self _setGraphedMin:Emin];
 		// ...and save the shape and inventory from the workspace
-		_workspaceRect = [workspace getWorkspaceRect];
+		[self _setGraphedRect:[workspace getWorkspaceRect]];
 		[self _setInventory:inventory];
 	}
 
@@ -359,6 +412,9 @@
 			if (_values[i] == nil) {
 				error = YES;
 				NSLog(@"[ResultsView -initWithRows:andCols:] - while trying to create a row of doubles (%d out of %d rows), I ran into a memory allocation problem and couldn't continue. Please check into this as soon as possible.", (i+1), rowCnt);
+			} else {
+				// clear out the array with zeros
+				vDSP_vclrD(_values[i], 1, colCnt);
 			}
 		}
 	}

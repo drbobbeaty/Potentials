@@ -38,6 +38,39 @@
 @implementation ResultsView (Protected)
 
 /*!
+ This method gets the actual minimum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (void) _setGraphedMin:(double)value
+{
+	_graphedMin = value;
+}
+
+
+/*!
+ This method gets the actual maximum value of the displayed graphical data.
+ This is the un-scaled value, that internally will be used to scale all the
+ plotting data from [0..1].
+ */
+- (void) _setGraphedMax:(double)value
+{
+	_graphedMax = value;
+}
+
+
+/*!
+ This method returns the shape of the simulated workspace that is being
+ plotted on this view. This is the un-scaled shape, and is used in the
+ mapping from that workspace to the view.
+ */
+- (void) _setGraphedRect:(NSRect)shape
+{
+	_workspaceRect = shape;
+}
+
+
+/*!
  This method sets the inventory of drawable objects from the SimWorkspace
  so that we can draw them on the simulation plot. They are all scaled to
  have linear dimensions [0..1] so it's easy to place them on the NSView.
