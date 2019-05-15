@@ -328,8 +328,7 @@
 	// Create the File Open Dialog class.
 	NSOpenPanel*	openDlg = nil;
 	if (!error) {
-		openDlg = [NSOpenPanel openPanel];
-		if (openDlg == nil) {
+		if ((openDlg = [NSOpenPanel openPanel]) == nil) {
 			error = YES;
 			NSLog(@"[MrBig -loadFromFile:] - I could not create an NSOpenPanel for asking the user what file to load. Please check on this as soon as possible.");
 		} else {
@@ -455,8 +454,7 @@
 	// Create the File Save Dialog class.
 	NSSavePanel*	saveDlg = nil;
 	if (!error) {
-		saveDlg = [NSSavePanel savePanel];
-		if (saveDlg == nil) {
+		if ((saveDlg = [NSSavePanel savePanel]) == nil) {
 			error = YES;
 			NSLog(@"[MrBig -saveAsToFile:] - I could not create an NSSavePanel for asking the user what file to save this as. Please check on this as soon as possible.");
 		} else {
@@ -1003,17 +1001,14 @@
 	NSMutableArray*		inventory = nil;
 	// at this point, create the returned array, and fill it
 	if (!error) {
-		inventory = [[[NSMutableArray alloc] init] autorelease];
-		if (inventory == nil) {
+		if ((inventory = [[[NSMutableArray alloc] init] autorelease]) == nil) {
 			error = true;
 			NSLog(@"[MrBig -createDrawableSimObjs] - the storage for all the drawable simulation objects could not be created. This is a serious allocation error and needs to be looked into as soon as possible.");
 		} else {
 			NSDictionary*	info = nil;
 			for (BaseSimObj* obj in [[self getFactory] getInventory]) {
 				// everything draws to the view, based on the workspace
-				info = [obj drawingInfo:ws];
-				if (info != nil) {
-					NSLog(@"[MrBig -createDrawableSimObjs] - adding %@ to the inventory", info);
+				if ((info = [obj drawingInfo:ws]) != nil) {
 					[inventory addObject:info];
 				}
 			}

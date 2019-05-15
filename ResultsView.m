@@ -488,108 +488,17 @@
 	NSRectFill(dirtyRect);
 
 	// plot all the simulation data on the viewport
-	CGContextRef	myContext = nil;
-	NSColor*		spectrum[] = {[NSColor blueColor],
-								  [NSColor redColor],
-								  [NSColor orangeColor],
-								  [NSColor yellowColor],
-								  [NSColor cyanColor]};
-	int 			stages = 5;
-	double			dc = 1.0/(stages - 1);
-	if (_values != nil) {
-		myContext = [[NSGraphicsContext currentContext] CGContext];
-		CGFloat		dx = [self frame].size.width / _colCnt;
-		CGFloat		dy = [self frame].size.height / _rowCnt;
-		NSColor*	gc = nil;
-		CGFloat		red, grn, blu, alph;
-		double		x = 0.0;
-		int 		ilow = 0;
-		for (int r = 0; r < _rowCnt; r++) {
-			for (int c = 0; c < _colCnt; c++) {
-				x = _values[r][c];
-				ilow = MIN((int)(x/dc), (stages-2));
-				x -= ilow * dc;
-				gc = [ResultsView interpolate:(x/dc) withColorsBetween:spectrum[ilow] and:spectrum[ilow+1]];
-				if (gc) {
-					[gc getRed:(&red) green:(&grn) blue:(&blu) alpha:(&alph)];
-					CGContextSetRGBFillColor(myContext, red, grn, blu, alph);
-					CGContextFillRect(myContext, CGRectMake(c*dx, r*dy, dx, dy));
-				}
-			}
-		}
-	}
+	CGContextRef	myContext = [[NSGraphicsContext currentContext] CGContext];
+	NSArray*		spectrum = @[[NSColor blueColor],
+								 [NSColor redColor],
+								 [NSColor orangeColor],
+								 [NSColor yellowColor],
+								 [NSColor cyanColor]];
+	[self _plotDataOn:myContext with:spectrum];
 
 	// now draw all the objects in the workspace on top of this...
-	if ([self getInventory] != nil) {
-		CGFloat		sx = [self frame].size.width;
-		CGFloat		sy = [self frame].size.height;
-		NSLog(@"[ResultsView -drawRect:] - drawing size: %.2fx%.2f", sx, sy);
-		for (NSDictionary* info in [self getInventory]) {
-			// everything draws to the view, scaled on the
-			NSString*	draw = info[@"draw"];
-			if ([draw isEqualToString:@"line"]) {
-				// get the specifics for the line from the data
-				NSPoint		beg = [info[@"from"] pointValue];
-				NSPoint		end = [info[@"to"] pointValue];
-				// map it to the viewport for drawing
-				beg.x *= sx;
-				beg.y *= sy;
-				end.x *= sx;
-				end.y *= sy;
-				CGPoint		line[] = {beg, end};
-				NSLog(@"[ResultsView -drawRect:] - drawing line inventory: (%.2f, %.2f) -> (%.2f, %.2f)", beg.x, beg.y, end.x, end.y);
-				// draw the line in the viewport
-				CGContextBeginPath(myContext);
-				CGContextSetLineWidth(myContext, 1.0);
-				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
-				CGContextAddLines(myContext, line, 2);
-				CGContextStrokePath(myContext);
-			} else if ([draw isEqualToString:@"rect"]) {
-				// get the specifics for the rectasngle from the data
-				NSRect		rect = [info[@"data"] rectValue];
-				// map it to the viewport for drawing
-				rect.origin.x *= sx;
-				rect.origin.y *= sy;
-				rect.size.width *= sx;
-				rect.size.height *= sy;
-				NSLog(@"[ResultsView -drawRect:] - drawing rect inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-				// draw the rectangle in the viewport
-				CGContextBeginPath(myContext);
-				CGContextSetLineWidth(myContext, 1.0);
-				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
-				CGContextAddRect(myContext, rect);
-				CGContextStrokePath(myContext);
-			} else if ([draw isEqualToString:@"point"]) {
-				// get the specifics for the point from the data
-				NSPoint		pt = [info[@"data"] pointValue];
-				// map it to the viewport for drawing
-				pt.x *= sx;
-				pt.y *= sy;
-				NSLog(@"[ResultsView -drawRect:] - drawing point inventory: (%.2f, %.2f)", pt.x, pt.y);
-				// draw the point in the viewport
-				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
-				CGContextFillRect(myContext, CGRectMake(pt.x, pt.y, 3, 3));
-			} else if ([draw isEqualToString:@"circle"]) {
-				// get the specifics for the circle from the data
-				NSRect		rect = [info[@"data"] rectValue];
-				// map it to the viewport for drawing
-				rect.origin.x *= sx;
-				rect.origin.y *= sy;
-				rect.size.width *= sx;
-				rect.size.height *= sy;
-				NSLog(@"[ResultsView -drawRect:] - drawing circle inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
-				// draw the circle in the viewport
-				CGContextBeginPath(myContext);
-				CGContextSetLineWidth(myContext, 1.0);
-				CGContextSetRGBStrokeColor(myContext, 0.0, 0.0, 0.0, 1.0);
-				CGContextAddEllipseInRect(myContext, rect);
-				CGContextStrokePath(myContext);
-			} else {
-				NSLog(@"[ResultsView -drawRect:] - unable to draw the figure: %@", info);
-			}
-		}
-	}
-
+	[self _drawInventoryOn:myContext with:[NSColor blackColor]];
+	
 	NSLog(@"[ResultsView -drawRect:] - plot drawn in %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 }
 

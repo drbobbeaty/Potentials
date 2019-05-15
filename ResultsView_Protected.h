@@ -71,4 +71,30 @@
  */
 - (void) _setInventory:(NSArray*)inventory;
 
+//----------------------------------------------------------------------------
+//               Component Drawing Methods
+//----------------------------------------------------------------------------
+
+/*!
+ This method takes the context on which to draw the colorized 2D heat map of
+ data, and the array of colors to blend between for the different [0..1]
+ values. This will simply draw all the rectangles of diffderent colors based
+ on the values in this instance - nothing more.
+ */
+- (BOOL) _plotDataOn:(CGContextRef)ctext with:(NSArray*)colors;
+
+/*!
+ This method takes the context on which to draw the inventory of objects that
+ were part of the simulation, as well as a color to render them in. This
+ just makes it easy to optionally draw the inventory - at the user's request.
+ */
+- (BOOL) _drawInventoryOn:(CGContextRef)ctext with:(NSColor*)color;
+
+/*!
+ This method takes an object - defined as an NSDictionary, and the context
+ on which to draw it, as well as a color to render in - and then draws it
+ as needed. This just gets called for each item in the Inventory.
+ */
+- (BOOL) _draw:(NSDictionary*)item on:(CGContextRef)ctext with:(NSColor*)color;
+
 @end
