@@ -97,4 +97,18 @@
  */
 - (BOOL) _draw:(NSDictionary*)item on:(CGContextRef)ctext with:(NSColor*)color;
 
+/*!
+ This method takes the array of values, and draws the contour lines for each
+ in the provided context. These values will be in the interval [0..1] and in
+ keeping with the scaled plotted values.
+ */
+- (BOOL) _drawContours:(NSArray*)values on:(CGContextRef)ctext with:(NSColor*)color;
+
+/*!
+ This method takes a single value, and draws the contour line(s) for this
+ value in the provided context. The value will be in the interval [0..1] and
+ in keeping with the scaled plotted values.
+ */
+- (BOOL) _drawContour:(double)value on:(CGContextRef)ctext with:(NSColor*)color;
+
 @end

@@ -234,4 +234,123 @@
 	return !error;
 }
 
+
+/*!
+ This method takes the array of values, and draws the contour lines for each
+ in the provided context. These values will be in the interval [0..1] and in
+ keeping with the scaled plotted values.
+ */
+- (BOOL) _drawContours:(NSArray*)values on:(CGContextRef)ctext with:(NSColor*)color
+{
+	BOOL			error = NO;
+
+	if (values != nil) {
+		for (NSNumber* num in values) {
+			if (num != nil) {
+				[self _drawContour:[num doubleValue] on:ctext with:color];
+			}
+		}
+	}
+
+	return !error;
+}
+
+
+/*!
+ This method takes a single value, and draws the contour line(s) for this
+ value in the provided context. The value will be in the interval [0..1] and
+ in keeping with the scaled plotted values.
+ */
+- (BOOL) _drawContour:(double)value on:(CGContextRef)ctext with:(NSColor*)color
+{
+	BOOL			error = NO;
+
+	if (_values != nil) {
+		CGFloat		dx = [self frame].size.width / [self getColCount];
+		CGFloat		dy = [self frame].size.height / [self getRowCount];
+		BOOL		ul, ur, ll, lr;
+		NSPoint		pbeg, pend, qbeg, qend;
+		NSPoint		oob = NSMakePoint(-1, -1);		// out-of-bounds point
+		CGFloat		x = 0.0, y = 0.0;
+		for (int r = 0; r < ([self getRowCount]-1); r++) {
+			for (int c = 0; c < ([self getColCount]-1); c++) {
+				// reset the origin of this square
+				x = c*dx;
+				y = r*dy;
+				// reset the endpoints of the line(s)
+				pbeg = oob;		// line 'p'
+				pend = oob;
+				qbeg = oob;		// line 'q'
+				qend = oob;
+				// now compute the in/out state of the four corners
+				ul = (_values[r+1][c] < value);
+				ur = (_values[r+1][c+1] < value);
+				ll = (_values[r][c] < value);
+				lr = (_values[r][c+1] < value);
+				// look at all 16 possibilities, and see what line(s) are needed
+				if ((ul && ur && ll && lr) || (!ul && !ur && !ll && !lr)) {
+					// do nothing - uniform across the square
+					continue;
+				} else if ((ul && !ur && !ll && !lr) || (!ul && ur && ll && lr)) {
+					// line from left to top
+					pbeg = NSMakePoint(x, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y+dy);
+				} else if ((!ul && ur && !ll && !lr) || (ul && !ur && ll && lr)) {
+					// line from right to top
+					pbeg = NSMakePoint(x+dx, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y+dy);
+				} else if ((!ul && !ur && ll && !lr) || (ul && ur && !ll && lr)) {
+					// line from left to bottom
+					pbeg = NSMakePoint(x, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y);
+				} else if ((!ul && !ur && !ll && lr) || (ul && ur && ll && !lr)) {
+					// line from right to bottom
+					pbeg = NSMakePoint(x+dx, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y);
+				} else if ((ul && ur && !ll && !lr) || (!ul && !ur && ll && lr)) {
+					// line from left to right
+					pbeg = NSMakePoint(x, y+dy/2);
+					pend = NSMakePoint(x+dx, y+dy/2);
+				} else if ((ul && !ur && ll && !lr) || (!ul && ur && !ll && lr)) {
+					// line from bottom to top
+					pbeg = NSMakePoint(x+dx/2, y);
+					pend = NSMakePoint(x+dx/2, y+dy);
+				} else if (ul && !ur && !ll && lr) {
+					// two lines: left to top, and bottom to right
+					pbeg = NSMakePoint(x, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y+dy);
+					qbeg = NSMakePoint(x+dx, y+dy/2);
+					qend = NSMakePoint(x+dx/2, y);
+				} else if (!ul && ur && ll && !lr) {
+					// two lines: left to bottom, and top to right
+					pbeg = NSMakePoint(x, y+dy/2);
+					pend = NSMakePoint(x+dx/2, y);
+					qbeg = NSMakePoint(x+dx, y+dy/2);
+					qend = NSMakePoint(x+dx/2, y+dy);
+				}
+				// now see what we need to draw... we have line 'p'...
+				CGPoint		line[] = {pbeg, pend};
+				// draw the line in the viewport
+				CGContextBeginPath(ctext);
+				CGContextSetLineWidth(ctext, 1.0);
+				[color setStroke];
+				CGContextAddLines(ctext, line, 2);
+				CGContextStrokePath(ctext);
+				// see if we have line 'q'...
+				if (!NSEqualPoints(qbeg, oob)) {
+					CGPoint		line[] = {qbeg, qend};
+					// draw the line in the viewport
+					CGContextBeginPath(ctext);
+					CGContextSetLineWidth(ctext, 1.0);
+					[color setStroke];
+					CGContextAddLines(ctext, line, 2);
+					CGContextStrokePath(ctext);
+				}
+			}
+		}
+	}
+
+	return !error;
+}
+
 @end

@@ -496,6 +496,10 @@
 								 [NSColor cyanColor]];
 	[self _plotDataOn:myContext with:spectrum];
 
+	// now draw the default contour lines for the data
+	NSArray*	units = @[@0.1, @0.2, @0.3, @0.4, @0.5, @0.6, @0.7, @0.8, @0.9];
+	[self _drawContours:units on:myContext with:[NSColor darkGrayColor]];
+
 	// now draw all the objects in the workspace on top of this...
 	[self _drawInventoryOn:myContext with:[NSColor blackColor]];
 	
