@@ -87,6 +87,11 @@ RC 2.5 2.5 2.5 2.5 10.0
 PM 5.0 5.0 50
 ```
 
+The output is generated in the UI, and looks something like this:
+<p align="center">
+  <img src="doc/img/potentials.jpg" width="365" height="461" border="0" />
+</p>
+
 ## Plans
 
 Now that it's on Xcode 10.2, I want to visualize the results - both `V(x,y)`
