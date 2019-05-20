@@ -268,6 +268,7 @@
 	if (_values != nil) {
 		CGFloat		dx = [self frame].size.width / [self getColCount];
 		CGFloat		dy = [self frame].size.height / [self getRowCount];
+		double 		vul, vll, vur, vlr, sx, sy;
 		BOOL		ul, ur, ll, lr;
 		NSPoint		pbeg, pend, qbeg, qend;
 		NSPoint		oob = NSMakePoint(-1, -1);		// out-of-bounds point
@@ -282,51 +283,76 @@
 				pend = oob;
 				qbeg = oob;		// line 'q'
 				qend = oob;
+				// grab the four corner values from the data
+				vul = _values[r+1][c];
+				vur = _values[r+1][c+1];
+				vll = _values[r][c];
+				vlr = _values[r][c+1];
 				// now compute the in/out state of the four corners
-				ul = (_values[r+1][c] < value);
-				ur = (_values[r+1][c+1] < value);
-				ll = (_values[r][c] < value);
-				lr = (_values[r][c+1] < value);
+				ul = (vul < value);
+				ur = (vur < value);
+				ll = (vll < value);
+				lr = (vlr < value);
 				// look at all 16 possibilities, and see what line(s) are needed
 				if ((ul && ur && ll && lr) || (!ul && !ur && !ll && !lr)) {
 					// do nothing - uniform across the square
 					continue;
 				} else if ((ul && !ur && !ll && !lr) || (!ul && ur && ll && lr)) {
 					// line from left to top
-					pbeg = NSMakePoint(x, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y+dy);
+					sy = (value - vll)/(vul - vll);
+					pbeg = NSMakePoint(x, y+dy*sy);
+					sx = (value - vul)/(vur - vul);
+					pend = NSMakePoint(x+dx*sx, y+dy);
 				} else if ((!ul && ur && !ll && !lr) || (ul && !ur && ll && lr)) {
 					// line from right to top
-					pbeg = NSMakePoint(x+dx, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y+dy);
+					sy = (value - vlr)/(vur - vlr);
+					pbeg = NSMakePoint(x+dx, y+dy*sy);
+					sx = (value - vul)/(vur - vul);
+					pend = NSMakePoint(x+dx*sx, y+dy);
 				} else if ((!ul && !ur && ll && !lr) || (ul && ur && !ll && lr)) {
 					// line from left to bottom
-					pbeg = NSMakePoint(x, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y);
+					sy = (value - vll)/(vul - vll);
+					pbeg = NSMakePoint(x, y+dy*sy);
+					sx = (value - vll)/(vlr - vll);
+					pend = NSMakePoint(x+dx*sx, y);
 				} else if ((!ul && !ur && !ll && lr) || (ul && ur && ll && !lr)) {
 					// line from right to bottom
-					pbeg = NSMakePoint(x+dx, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y);
+					sy = (value - vlr)/(vur - vlr);
+					pbeg = NSMakePoint(x+dx, y+dy*sy);
+					sx = (value - vll)/(vlr - vll);
+					pend = NSMakePoint(x+dx*sx, y);
 				} else if ((ul && ur && !ll && !lr) || (!ul && !ur && ll && lr)) {
 					// line from left to right
-					pbeg = NSMakePoint(x, y+dy/2);
-					pend = NSMakePoint(x+dx, y+dy/2);
+					sy = (value - vll)/(vul - vll);
+					pbeg = NSMakePoint(x, y+dy*sy);
+					sy = (value - vlr)/(vur - vlr);
+					pend = NSMakePoint(x+dx, y+dy*sy);
 				} else if ((ul && !ur && ll && !lr) || (!ul && ur && !ll && lr)) {
 					// line from bottom to top
-					pbeg = NSMakePoint(x+dx/2, y);
-					pend = NSMakePoint(x+dx/2, y+dy);
+					sx = (value - vll)/(vlr - vll);
+					pbeg = NSMakePoint(x+dx*sx, y);
+					sx = (value - vul)/(vur - vul);
+					pend = NSMakePoint(x+dx*sx, y+dy);
 				} else if (ul && !ur && !ll && lr) {
 					// two lines: left to top, and bottom to right
-					pbeg = NSMakePoint(x, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y+dy);
-					qbeg = NSMakePoint(x+dx, y+dy/2);
-					qend = NSMakePoint(x+dx/2, y);
+					sy = (value - vll)/(vul - vll);
+					pbeg = NSMakePoint(x, y+dy*sy);
+					sx = (value - vul)/(vur - vul);
+					pend = NSMakePoint(x+dx*sx, y+dy);
+					sy = (value - vlr)/(vur - vlr);
+					qbeg = NSMakePoint(x+dx, y+dy*sy);
+					sx = (value - vll)/(vlr - vll);
+					qend = NSMakePoint(x+dx*sx, y);
 				} else if (!ul && ur && ll && !lr) {
 					// two lines: left to bottom, and top to right
-					pbeg = NSMakePoint(x, y+dy/2);
-					pend = NSMakePoint(x+dx/2, y);
-					qbeg = NSMakePoint(x+dx, y+dy/2);
-					qend = NSMakePoint(x+dx/2, y+dy);
+					sy = (value - vll)/(vul - vll);
+					pbeg = NSMakePoint(x, y+dy*sy);
+					sx = (value - vll)/(vlr - vll);
+					pend = NSMakePoint(x+dx*sx, y);
+					sy = (value - vlr)/(vur - vlr);
+					qbeg = NSMakePoint(x+dx, y+dy*sy);
+					sx = (value - vul)/(vur - vul);
+					qend = NSMakePoint(x+dx*sx, y+dy);
 				}
 				// now see what we need to draw... we have line 'p'...
 				CGPoint		line[] = {pbeg, pend};
