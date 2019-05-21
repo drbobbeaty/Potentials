@@ -117,7 +117,7 @@
 				x -= ilow * dc;
 				if ((gc = [ResultsView interpolate:(x/dc) withColorsBetween:colors[ilow] and:colors[ilow+1]])) {
 					[gc setFill];
-					CGContextFillRect(ctext, CGRectMake(c*dx, r*dy, dx, dy));
+					CGContextFillRect(ctext, CGRectMake(c*dx, r*dy, dx+0.5, dy+0.5));
 				}
 			}
 		}
