@@ -487,6 +487,12 @@
 	[[NSColor whiteColor] setFill];
 	NSRectFill(dirtyRect);
 
+	// compute the proper scale factor for drawing...
+	_pelsPerUnit = MIN(([self frame].size.width/[self getGraphedRect].size.width),([self frame].size.height/[self getGraphedRect].size.height));
+	// ...and the origin of the drawing area. We will need these
+	_drawOrigin.x = ([self frame].size.width - _pelsPerUnit*[self getGraphedRect].size.width)/2;
+	_drawOrigin.y = ([self frame].size.height - _pelsPerUnit*[self getGraphedRect].size.height)/2;
+
 	// plot all the simulation data on the viewport
 	CGContextRef	myContext = [[NSGraphicsContext currentContext] CGContext];
 	NSArray*		spectrum = @[[NSColor blueColor],
@@ -502,7 +508,7 @@
 
 	// now draw all the objects in the workspace on top of this...
 	[self _drawInventoryOn:myContext with:[NSColor blackColor]];
-	
+
 	NSLog(@"[ResultsView -drawRect:] - plot drawn in %.3f msec", ([NSDate timeIntervalSinceReferenceDate] - begin) * 1000);
 }
 

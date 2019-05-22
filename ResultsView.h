@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 	int				_colCnt;
 	double**		_values;
 	NSArray*		_inventory;
+	double 			_pelsPerUnit;
+	NSPoint			_drawOrigin;
 }
 
 //----------------------------------------------------------------------------

@@ -105,8 +105,8 @@
 	NSUInteger 		stages = [colors count];
 	double			dc = 1.0/(stages - 1);
 	if (_values != nil) {
-		CGFloat		dx = [self frame].size.width / [self getColCount];
-		CGFloat		dy = [self frame].size.height / [self getRowCount];
+		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / [self getColCount];
+		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / [self getRowCount];
 		NSColor*	gc = nil;
 		double		x = 0.0;
 		NSUInteger	ilow = 0;
@@ -117,7 +117,7 @@
 				x -= ilow * dc;
 				if ((gc = [ResultsView interpolate:(x/dc) withColorsBetween:colors[ilow] and:colors[ilow+1]])) {
 					[gc setFill];
-					CGContextFillRect(ctext, CGRectMake(c*dx, r*dy, dx+0.5, dy+0.5));
+					CGContextFillRect(ctext, CGRectMake(_drawOrigin.x+c*dx, _drawOrigin.y+r*dy, dx+0.5, dy+0.5));
 				}
 			}
 		}
@@ -158,8 +158,8 @@
 	BOOL			error = NO;
 
 	// grab the scale factors for the [0..1] ranges
-	CGFloat		sx = [self frame].size.width;
-	CGFloat		sy = [self frame].size.height;
+	CGFloat		sx = _pelsPerUnit * [self getGraphedRect].size.width;
+	CGFloat		sy = _pelsPerUnit * [self getGraphedRect].size.height;
 	// make sure we default to black for the drawing
 	if (color == nil) {
 		color = [NSColor blackColor];
@@ -174,12 +174,12 @@
 			NSPoint		beg = [item[@"from"] pointValue];
 			NSPoint		end = [item[@"to"] pointValue];
 			// map it to the viewport for drawing
-			beg.x *= sx;
-			beg.y *= sy;
-			end.x *= sx;
-			end.y *= sy;
+			beg.x = beg.x*sx + _drawOrigin.x;
+			beg.y = beg.y*sy + _drawOrigin.y;
+			end.x = end.x*sx + _drawOrigin.x;
+			end.y = end.y*sy + _drawOrigin.y;
 			CGPoint		line[] = {beg, end};
-			NSLog(@"[ResultsView -draw:on:with:] - drawing line inventory: (%.2f, %.2f) -> (%.2f, %.2f)", beg.x, beg.y, end.x, end.y);
+			NSLog(@"[ResultsView -_draw:on:with:] - drawing line inventory: (%.2f, %.2f) -> (%.2f, %.2f)", beg.x, beg.y, end.x, end.y);
 			// draw the line in the viewport
 			CGContextBeginPath(ctext);
 			CGContextSetLineWidth(ctext, 1.0);
@@ -190,11 +190,11 @@
 			// get the specifics for the rectangle from the data
 			NSRect		rect = [item[@"data"] rectValue];
 			// map it to the viewport for drawing
-			rect.origin.x *= sx;
-			rect.origin.y *= sy;
+			rect.origin.x = rect.origin.x*sx + _drawOrigin.x;
+			rect.origin.y = rect.origin.y*sy + _drawOrigin.y;
 			rect.size.width *= sx;
 			rect.size.height *= sy;
-			NSLog(@"[ResultsView -draw:on:with:] - drawing rect inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+			NSLog(@"[ResultsView -_draw:on:with:] - drawing rect inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 			// draw the rectangle in the viewport
 			CGContextBeginPath(ctext);
 			CGContextSetLineWidth(ctext, 1.0);
@@ -205,9 +205,9 @@
 			// get the specifics for the point from the data
 			NSPoint		pt = [item[@"data"] pointValue];
 			// map it to the viewport for drawing
-			pt.x *= sx;
-			pt.y *= sy;
-			NSLog(@"[ResultsView -draw:on:with:] - drawing point inventory: (%.2f, %.2f)", pt.x, pt.y);
+			pt.x = pt.x*sx + _drawOrigin.x;
+			pt.y = pt.y*sy + _drawOrigin.y;
+			NSLog(@"[ResultsView -_draw:on:with:] - drawing point inventory: (%.2f, %.2f)", pt.x, pt.y);
 			// draw the point in the viewport
 			[color setStroke];
 			CGContextFillRect(ctext, CGRectMake(pt.x, pt.y, 3, 3));
@@ -215,11 +215,11 @@
 			// get the specifics for the circle from the data
 			NSRect		rect = [item[@"data"] rectValue];
 			// map it to the viewport for drawing
-			rect.origin.x *= sx;
-			rect.origin.y *= sy;
+			rect.origin.x = rect.origin.x*sx + _drawOrigin.x;
+			rect.origin.y = rect.origin.y*sy + _drawOrigin.y;
 			rect.size.width *= sx;
 			rect.size.height *= sy;
-			NSLog(@"[ResultsView -draw:on:with:] - drawing circle inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+			NSLog(@"[ResultsView -_draw:on:with:] - drawing circle inventory: (%.2f, %.2f) %.2fx%.2f", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
 			// draw the circle in the viewport
 			CGContextBeginPath(ctext);
 			CGContextSetLineWidth(ctext, 1.0);
@@ -227,7 +227,7 @@
 			CGContextAddEllipseInRect(ctext, rect);
 			CGContextStrokePath(ctext);
 		} else {
-			NSLog(@"[ResultsView -draw:on:with:] - unable to draw the figure: %@", item);
+			NSLog(@"[ResultsView -_draw:on:with:] - unable to draw the figure: %@", item);
 		}
 	}
 
@@ -266,8 +266,8 @@
 	BOOL			error = NO;
 
 	if (_values != nil) {
-		CGFloat		dx = [self frame].size.width / [self getColCount];
-		CGFloat		dy = [self frame].size.height / [self getRowCount];
+		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / [self getColCount];
+		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / [self getRowCount];
 		double 		vul, vll, vur, vlr, sx, sy;
 		BOOL		ul, ur, ll, lr;
 		NSPoint		pbeg, pend, qbeg, qend;
@@ -276,8 +276,8 @@
 		for (int r = 0; r < ([self getRowCount]-1); r++) {
 			for (int c = 0; c < ([self getColCount]-1); c++) {
 				// reset the origin of this square
-				x = c*dx;
-				y = r*dy;
+				x = _drawOrigin.x + c*dx;
+				y = _drawOrigin.y + r*dy;
 				// reset the endpoints of the line(s)
 				pbeg = oob;		// line 'p'
 				pend = oob;
