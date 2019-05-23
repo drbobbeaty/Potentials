@@ -105,14 +105,21 @@
 	NSUInteger 		stages = [colors count];
 	double			dc = 1.0/(stages - 1);
 	if (_values != nil) {
-		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / [self getColCount];
-		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / [self getRowCount];
+		// we are running through all the *complete* groups of 4 points
+		int 		rcnt = [self getColCount] - 1;
+		int 		ccnt = [self getRowCount] - 1;
+		// ...and we need to calculate the size of each drawn rectangle
+		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / rcnt;
+		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / ccnt;
 		NSColor*	gc = nil;
-		double		x = 0.0;
+		double 		x = 0.0;
 		NSUInteger	ilow = 0;
-		for (int r = 0; r < [self getRowCount]; r++) {
-			for (int c = 0; c < [self getColCount]; c++) {
-				x = _values[r][c];
+		for (int r = 0; r < rcnt; r++) {
+			for (int c = 0; c < ccnt; c++) {
+				// grab the max of the four corner values from the data
+				x = MAX( MAX(_values[r+1][c], _values[r+1][c+1]),
+						 MAX(_values[r][c], _values[r][c+1]) );
+				// ...now find the colors bracketing this value
 				ilow = MIN((int)(x/dc), (stages-2));
 				x -= ilow * dc;
 				if ((gc = [ResultsView interpolate:(x/dc) withColorsBetween:colors[ilow] and:colors[ilow+1]])) {
@@ -266,15 +273,19 @@
 	BOOL			error = NO;
 
 	if (_values != nil) {
-		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / [self getColCount];
-		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / [self getRowCount];
+		// we are running through all the *complete* groups of 4 points
+		int 		rcnt = [self getColCount] - 1;
+		int 		ccnt = [self getRowCount] - 1;
+		// ...and we need to calculate the size of each drawn rectangle
+		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / rcnt;
+		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / ccnt;
 		double 		vul, vll, vur, vlr, sx, sy;
 		BOOL		ul, ur, ll, lr;
 		NSPoint		pbeg, pend, qbeg, qend;
 		NSPoint		oob = NSMakePoint(-1, -1);		// out-of-bounds point
 		CGFloat		x = 0.0, y = 0.0;
-		for (int r = 0; r < ([self getRowCount]-1); r++) {
-			for (int c = 0; c < ([self getColCount]-1); c++) {
+		for (int r = 0; r < rcnt; r++) {
+			for (int c = 0; c < ccnt; c++) {
 				// reset the origin of this square
 				x = _drawOrigin.x + c*dx;
 				y = _drawOrigin.y + r*dy;
