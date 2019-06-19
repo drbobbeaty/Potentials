@@ -117,8 +117,8 @@
 		for (int r = 0; r < rcnt; r++) {
 			for (int c = 0; c < ccnt; c++) {
 				// grab the max of the four corner values from the data
-				x = MAX( MAX(_values[r+1][c], _values[r+1][c+1]),
-						 MAX(_values[r][c], _values[r][c+1]) );
+				x = fmax(fmax(_values[r+1][c], _values[r+1][c+1]),
+						 fmax(_values[r][c], _values[r][c+1]));
 				// ...now find the colors bracketing this value
 				ilow = MIN((int)(x/dc), (stages-2));
 				x -= ilow * dc;
