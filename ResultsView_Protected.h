@@ -111,4 +111,11 @@
  */
 - (BOOL) _drawContour:(double)value on:(CGContextRef)ctext with:(NSColor*)color;
 
+/*!
+ This method draws the direction arrows for each point in the simulation in
+ the provided context. These directional values will be in the interval
+ [-pi..pi] and in keeping with the scaled plotted values.
+ */
+- (BOOL) _drawArrowsOn:(CGContextRef)ctext with:(NSColor*)color;
+
 @end

@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 	int 			_rowCnt;
 	int				_colCnt;
 	double**		_values;
+	double**		_direction;
 	NSArray*		_inventory;
 	double 			_pelsPerUnit;
 	NSPoint			_drawOrigin;
@@ -67,6 +68,13 @@ NS_ASSUME_NONNULL_BEGIN
  plotting data from [0..1].
  */
 - (double) getGraphedMax;
+
+/*!
+ This method returns YES if the computed data in this instance is complex
+ in nature - that is magnitude and direction as opposed to just a scalar
+ value.
+ */
+- (BOOL) isComplex;
 
 /*!
  This method returns the shape of the simulated workspace that is being
@@ -153,6 +161,16 @@ NS_ASSUME_NONNULL_BEGIN
  time resizing to the desired dimensions.
  */
 - (id) initWithRows:(int)rowCnt andCols:(int)colCnt;
+
+/*!
+ This method drops any matrix that might already be allocated in this
+ instance and attempts to allocate a new matrix of the given size capable
+ of holding both magnitude and direction. If this is successful, then self
+ is returned. If not, then nil is returned. This method can be called many
+ times in the life of this object, each time resizing to the desired
+ dimensions.
+ */
+- (id) initComplexWithRows:(int)rowCnt andCols:(int)colCnt;
 
 /*!
  This method drops the allocated plotting data for this instance, and

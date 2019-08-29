@@ -64,6 +64,17 @@
 
 
 /*!
+ This method returns YES if the computed data in this instance is complex
+ in nature - that is magnitude and direction as opposed to just a scalar
+ value.
+ */
+- (BOOL) isComplex
+{
+	return (_direction != nil);
+}
+
+
+/*!
  This method returns the shape of the simulated workspace that is being
  plotted on this view. This is the un-scaled shape, and is used in the
  mapping from that workspace to the view.
@@ -201,7 +212,7 @@
 
 	// time to initialize the plotting data for the results
 	if (!error) {
-		if ([self initWithRows:[workspace getRowCount] andCols:[workspace getColCount]] == nil) {
+		if ([self initComplexWithRows:[workspace getRowCount] andCols:[workspace getColCount]] == nil) {
 			error = YES;
 			NSLog(@"[ResultsView -plotElectricField:] - space for the plotting display data could not be allocated.");
 		}
@@ -209,13 +220,16 @@
 
 	if (!error) {
 		double	em = 0.0;
+		double	ed = 0.0;
 		// now let's loop over all the points and write out what we want...
 		for (int r = 0; r < [self getRowCount]; r++) {
 			for (int c = 0; c < [self getColCount]; c++) {
 				// now get the results at this node
 				em = [workspace getResultantElectricFieldMagnitudeAtNodeRow:r andCol:c];
+				ed = [workspace getResultantElectricFieldDirectionAtNodeRow:r andCol:c];
 				// save all this for drawing
 				_values[r][c] = (em - Emin)/(Emax - Emin);
+				_direction[r][c] = ed;
 			}
 		}
 		// ...and save the limits we discovered for the graphing
@@ -444,6 +458,69 @@
 
 
 /*!
+ This method drops any matrix that might already be allocated in this
+ instance and attempts to allocate a new matrix of the given size capable
+ of holding both magnitude and direction. If this is successful, then self
+ is returned. If not, then nil is returned. This method can be called many
+ times in the life of this object, each time resizing to the desired
+ dimensions.
+ */
+- (id) initComplexWithRows:(int)rowCnt andCols:(int)colCnt
+{
+	BOOL			error = NO;
+
+	// first, let's make sure the super can be initialized
+	if (!error && (_values == nil)) {
+		if (![self initWithRows:rowCnt andCols:colCnt]) {
+			error = YES;
+			NSLog(@"[ResultsView -initComplexWithRows:andCols:] - the base initialization could not be completed. Please check the logs for a possible cause.");
+		}
+	}
+
+	// now, first try to allocate the vector of pointers for the doubles
+	if (!error) {
+		_direction = (double **) malloc( rowCnt * sizeof(double *) );
+		if (_direction == nil) {
+			error = YES;
+			NSLog(@"[ResultsView -initComplexWithRows:andCols:] - while trying to create the vector of pointers for the doubles (%d rows), I ran into a memory allocation problem and couldn't continue. Please check into this as soon as possible.", rowCnt);
+		}
+	}
+
+	// next, try to allocate each row of doubles
+	if (!error) {
+		for (int i = 0; i < rowCnt; i++) {
+			_direction[i] = (double *) malloc( colCnt * sizeof(double) );
+			if (_direction[i] == nil) {
+				error = YES;
+				NSLog(@"[ResultsView -initComplexWithRows:andCols:] - while trying to create a row of doubles (%d out of %d rows), I ran into a memory allocation problem and couldn't continue. Please check into this as soon as possible.", (i+1), rowCnt);
+			} else {
+				// clear out the array with zeros
+				vDSP_vclrD(_direction[i], 1, colCnt);
+			}
+		}
+	}
+
+	// if we have had any error we need to clean up what we've done
+	if (error) {
+		if (_direction != nil) {
+			// free up each of the rows themselves
+			for (int i = 0; i < rowCnt; i++) {
+				if (_direction[i] != nil) {
+					free(_direction[i]);
+					_direction[i] = nil;
+				}
+			}
+			// ...and then free up the vector of pointers
+			free(_direction);
+			_direction = nil;
+		}
+	}
+
+	return (error ? nil : self);
+}
+
+
+/*!
  This method drops the allocated plotting data for this instance, and
  is used to clean up the memory used and be a good non-leaking citizen.
  */
@@ -460,6 +537,19 @@
 		// ...and then free up the vector of pointers
 		free(_values);
 		_values = nil;
+	}
+
+	if (_direction != nil) {
+		// free up each of the rows themselves
+		for (int i = 0; i < _rowCnt; i++) {
+			if (_direction[i] != nil) {
+				free(_direction[i]);
+				_direction[i] = nil;
+			}
+		}
+		// ...and then free up the vector of pointers
+		free(_direction);
+		_direction = nil;
 	}
 
 	// make sure to clear out the size of the array, and the drawable inventory
@@ -502,9 +592,15 @@
 								 [NSColor cyanColor]];
 	[self _plotDataOn:myContext with:spectrum];
 
-	// now draw the default contour lines for the data
-	NSArray*	units = @[@0.1, @0.2, @0.3, @0.4, @0.5, @0.6, @0.7, @0.8, @0.9];
-	[self _drawContours:units on:myContext with:[NSColor darkGrayColor]];
+	// now draw the arrows for direction, or the contours for the scalar
+	if ([self isComplex]) {
+		// draw the arrows for the direction of the field at each point
+		[self _drawArrowsOn:myContext with:[NSColor darkGrayColor]];
+	} else {
+		// draw the default contour lines for the scalar data
+		NSArray*	units = @[@0.1, @0.2, @0.3, @0.4, @0.5, @0.6, @0.7, @0.8, @0.9];
+		[self _drawContours:units on:myContext with:[NSColor darkGrayColor]];
+	}
 
 	// now draw all the objects in the workspace on top of this...
 	[self _drawInventoryOn:myContext with:[NSColor blackColor]];

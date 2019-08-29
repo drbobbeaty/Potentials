@@ -6,6 +6,7 @@
 //
 
 // Apple Headers
+#import <Accelerate/Accelerate.h>
 
 // System Headers
 
@@ -383,6 +384,57 @@
 					CGContextAddLines(ctext, line, 2);
 					CGContextStrokePath(ctext);
 				}
+			}
+		}
+	}
+
+	return !error;
+}
+
+
+/*!
+ This method draws the direction arrows for each point in the simulation in
+ the provided context. These directional values will be in the interval
+ [-pi..pi] and in keeping with the scaled plotted values.
+ */
+- (BOOL) _drawArrowsOn:(CGContextRef)ctext with:(NSColor*)color
+{
+	BOOL			error = NO;
+
+	if (_direction != nil) {
+		// we are running through all the *complete* groups of 4 points
+		int 		rcnt = [self getColCount] - 1;
+		int 		ccnt = [self getRowCount] - 1;
+		// ...and we need to calculate the size of each drawn rectangle
+		CGFloat		dx = _pelsPerUnit * [self getGraphedRect].size.width / rcnt;
+		CGFloat		dy = _pelsPerUnit * [self getGraphedRect].size.height / ccnt;
+		CGFloat		x = 0.0, y = 0.0;
+		double		dir = 0.0;
+		for (int r = 0; r < rcnt; r++) {
+			for (int c = 0; c < ccnt; c++) {
+				// reset the origin of this square
+				x = _drawOrigin.x + c*dx;
+				y = _drawOrigin.y + r*dy;
+				// create an arrow pointing at (1,0)
+				CGPoint		arrow[] = { NSMakePoint(0.25, 0.15),
+									    NSMakePoint(0.35, 0.0),
+									    NSMakePoint(-0.35, 0.0),
+									    NSMakePoint(0.35, 0.0),
+									    NSMakePoint(0.25, -0.15) };
+				// get the direction of the arrow at this point
+				dir = _direction[r][c];
+				// now rotate, scale and move all points by the angle of the direction
+				double		fac = fmin(dx, dy);
+				CGAffineTransform	xfrm = CGAffineTransformConcat(CGAffineTransformConcat( CGAffineTransformMakeRotation(dir), CGAffineTransformMakeScale(fac, fac)), CGAffineTransformMakeTranslation(x+dx/2.0, y+dy/2.0));
+				for (size_t i = 0; i < 5; i++) {
+					arrow[i] = CGPointApplyAffineTransform(arrow[i], xfrm);
+				}
+				// ...and then draw it
+				CGContextBeginPath(ctext);
+				CGContextSetLineWidth(ctext, 1.0);
+				[color setStroke];
+				CGContextAddLines(ctext, arrow, 5);
+				CGContextStrokePath(ctext);
 			}
 		}
 	}
